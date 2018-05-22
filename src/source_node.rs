@@ -112,7 +112,7 @@ impl SourceNode {
             vlq::encode(
                 self.starting_line as i64 - mappings_context.current_original_line as i64,
                 &mut buf).unwrap();
-            buf.push('A' as u8); // original column 0
+            buf.push('A' as u8);
             mappings += str::from_utf8(&buf).unwrap();
 
             mappings_context.current_source = source_index;
