@@ -1,5 +1,4 @@
 extern crate source_list_map;
-extern crate regex;
 
 mod utils;
 

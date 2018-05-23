@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use code_node::CodeNode;
 use source_node::SourceNode;
 use mappings_context::MappingsContext;
-use ::Node;
+use Node;
 
 #[derive(Clone, Debug)]
 pub struct SourceListMap {
@@ -113,7 +113,6 @@ impl SourceListMap {
                 }
                 self.children = new_childern;
             }
-            _ => {}
         }
         self
     }

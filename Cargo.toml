@@ -5,4 +5,3 @@ version = "0.1.0"
 
 [dependencies]
 vlq = "0.5.1"
-regex = "1.0.0"

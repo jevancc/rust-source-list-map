@@ -4,7 +4,7 @@ use std::str;
 use helpers;
 use single_line_node::SingleLineNode;
 use mappings_context::MappingsContext;
-use ::Node;
+use Node;
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {

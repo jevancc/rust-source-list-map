@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use ::Node;
+use Node;
 
 #[derive(Clone, Debug)]
 pub struct MappingsContext {

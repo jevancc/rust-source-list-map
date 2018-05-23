@@ -3,7 +3,7 @@ extern crate vlq;
 use std::str;
 use helpers;
 use mappings_context::MappingsContext;
-use ::Node;
+use Node;
 
 #[derive(Clone, Debug)]
 pub struct CodeNode {
