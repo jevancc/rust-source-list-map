@@ -24,19 +24,16 @@ impl MappingsContext {
     }
 
     pub fn ensure_source(&mut self, src: String, original_source: Node) -> usize {
-        // HACK: use borrow instead of clone
-        let cloned_sources_indices = self.sources_indices.clone();
-        match cloned_sources_indices.get(&src) {
-            Some(si) => *si,
-            None => {
-                let idx = self.sources_indices.len();
-                if let Node::NString(_) = original_source {
-                    self.has_source_content = true;
-                }
-                self.sources_indices.insert(src.clone(), idx);
-                self.sources_content.insert(src, original_source);
-                idx
+        if self.sources_indices.contains_key(&src) {
+            *self.sources_indices.get(&src).unwrap()
+        } else {
+            let sources_indices_len = self.sources_indices.len();
+            if let Node::NString(_) = original_source {
+                self.has_source_content = true;
             }
+            self.sources_content.insert(src.clone(), original_source);
+            self.sources_indices.insert(src, sources_indices_len);
+            sources_indices_len
         }
     }
 

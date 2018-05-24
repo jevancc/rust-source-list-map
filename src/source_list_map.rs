@@ -102,15 +102,10 @@ impl SourceListMap {
             Node::NSingleLineNode(sln) => {
                 self.children.insert(0, Node::NSingleLineNode(sln))
             }
-            Node::NSourceListMap(slm) => {
+            Node::NSourceListMap(mut slm) => {
                 let mut new_childern = Vec::<Node>::new();
-                for child in slm.children {
-                    new_childern.push(child);
-                }
-                // HACK: use borrow instead of clone
-                for child in self.children.clone() {
-                    new_childern.push(child);
-                }
+                new_childern.append(&mut slm.children);
+                new_childern.append(&mut self.children);
                 self.children = new_childern;
             }
         }
