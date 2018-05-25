@@ -14,7 +14,7 @@ pub fn from_string_with_source_map(code: &str,
 	let lines: Vec<&str> = code.split('\n').collect();
 	let mut nodes: Vec<Node> = vec![];
 
-    let mut current_line: usize = 1;
+    let mut current_line: i64 = 1;
 	let mut current_source_index: usize = 0;
 	let mut current_source_node_line: usize = 0;
 
@@ -26,7 +26,7 @@ pub fn from_string_with_source_map(code: &str,
                 } else {
                     String::from(*line)
                 };
-                if mapping.is_empty() {
+                if !mapping.is_empty() {
                     let mut line_added: bool = false;
                     let mut rest = mapping.as_bytes().iter().cloned().peekable();
 
@@ -51,11 +51,11 @@ pub fn from_string_with_source_map(code: &str,
                                         let source_index = value as usize + current_source_index;
                                         current_source_index = source_index;
 
-                                        let mut line_position: usize;
+                                        let mut line_position: i64;
                                         if let Some(c) = rest.clone().peek() {
                                             if *c != (',' as u8) {
                                                 let value = vlq::decode(&mut rest).unwrap();
-                                                line_position = value as usize + current_line;
+                                                line_position = value + current_line as i64;
                                                 current_line = line_position;
                                             } else {
                                                 line_position = current_line;
@@ -67,6 +67,8 @@ pub fn from_string_with_source_map(code: &str,
                                         while let Some(c) = rest.clone().peek() {
                                             if *c != (',' as u8) {
                                                 rest.next();
+                                            } else {
+                                                break;
                                             }
                                         }
 
@@ -75,7 +77,7 @@ pub fn from_string_with_source_map(code: &str,
                                                 line.clone(),
                                                 sources.get(source_index),
                                                 sources_content.get(source_index),
-                                                line_position);
+                                                line_position as usize);
                                             true
                                         } else {
                                             false
@@ -96,17 +98,17 @@ pub fn from_string_with_source_map(code: &str,
         }
     }
     if mappings.len() < lines.len() {
-        let line_len = lines.len();
+        let lines_len = lines.len();
         let mut index = mappings.len();
-        while index < line_len - 1 && !lines[index].trim().is_empty() {
-            let line = String::from(lines[index]);
+        while index < lines_len - 1 && lines[index].trim().is_empty() {
+            let line = String::from(lines[index]) + "\n";
             add_code(&mut nodes, &mut current_source_node_line, line);
             index += 1;
         }
         let line = String::from(lines[index..].join("\n"));
         add_code(&mut nodes, &mut current_source_node_line, line);
     }
-    SourceListMap::new(Some(GenCode::CodeVec(nodes)), "", "")
+    SourceListMap::new(Some(GenCode::CodeVec(nodes)), None, None)
 }
 
 fn add_code(nodes: &mut Vec<Node>,
@@ -118,9 +120,11 @@ fn add_code(nodes: &mut Vec<Node>,
             return;
         }
         Some(Node::NSourceNode(ref mut n)) => {
-            n.add_generated_code(&generated_code);
-            *current_source_node_line += 1;
-            return;
+            if generated_code.trim().is_empty() {
+                n.add_generated_code(&generated_code);
+                *current_source_node_line += 1;
+                return;
+            }
         }
         _ => {}
     }
@@ -134,12 +138,12 @@ fn add_source(nodes: &mut Vec<Node>,
               original_source: Option<&&str>,
               line: usize) {
     let source = match source {
-        Some(s) => String::from(*s),
-        None => String::from(""),
+        Some(s) => Some(String::from(*s)),
+        None => None,
     };
     let original_source = match original_source {
-        Some(s) => String::from(*s),
-        None => String::from(""),
+        Some(s) => Some(String::from(*s)),
+        None => None,
     };
 
     if let Some(Node::NSourceNode(ref mut n)) = nodes.last_mut() {
