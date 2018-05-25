@@ -9,7 +9,7 @@ mod map_generated_code {
 
     #[test]
     fn should_map_generated_code_correctly() {
-        let mut map = SourceListMap::new(None, "", "");
+        let mut map = SourceListMap::new(None, None, None);
 
 		let source: String = vec![
 			"Normal Line 1",
@@ -31,17 +31,17 @@ mod map_generated_code {
 		].join("\n");
 
 		map.add(Node::NString(source.clone() + "\n"),
-                g_Str("file.txt"),
-                source.clone() + "\n");
+                Some(g_Str("file.txt")),
+                Some(source.clone() + "\n"));
         map.add(Node::NString(source.clone() + "\n"),
-                g_Str("file.txt"),
-                source.clone() + "\n");
+                Some(g_Str("file.txt")),
+                Some(source.clone() + "\n"));
         map.add(Node::NString(source.clone() + "\n"),
-                g_Str(""),
-                g_Str(""));
+                None,
+                None);
         map.add(Node::NString(source.clone()),
-                g_Str("file.txt"),
-                source.clone());
+                Some(g_Str("file.txt")),
+                Some(source.clone() + "\n"));
 
 		let mut new_map = map.map_generated_code(&|line| {
             line.replace(";", "\n").replace("\\\n", " ").replace("$\n", "")
@@ -89,8 +89,8 @@ mod map_generated_code {
         // TODO: Enhance performance and increase repeat to 200000
         let source = "MyLine\n".repeat(10000);
 
-        let mut map = SourceListMap::new(None, "", "");
-        map.add(Node::NString(source.clone()), g_Str("file.txt"), source.clone());
+        let mut map = SourceListMap::new(None, None, None);
+        map.add(Node::NString(source.clone()), Some(g_Str("file.txt")), Some(source.clone()));
         let mut new_map = map.map_generated_code(&|line| line);
         let result = new_map.to_string_with_source_map(Some(g_Str("test.txt")));
 

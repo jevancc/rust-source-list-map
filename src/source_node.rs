@@ -9,8 +9,8 @@ use Node;
 #[derive(Clone, Debug)]
 pub struct SourceNode {
     pub generated_code: String,
-    pub original_source: String,
-    pub source: String,
+    pub original_source: Option<String>,
+    pub source: Option<String>,
     pub starting_line: usize,
     pub _number_of_lines: usize,
     pub _ends_with_new_line: bool,
@@ -18,8 +18,8 @@ pub struct SourceNode {
 
 impl SourceNode {
     pub fn new(generated_code: String,
-               source: String,
-               original_source: String,
+               source: Option<String>,
+               original_source: Option<String>,
                starting_line: usize)
                -> Self {
         SourceNode {
@@ -97,7 +97,12 @@ impl SourceNode {
             let line_mapping = ";AACA";
             let lines = self._number_of_lines;
             let source_index =
-                mappings_context.ensure_source(self.source.clone(), Node::NString(self.original_source.clone()));
+                mappings_context.ensure_source(self.source.clone(),
+                                            if let Some(ref s) = self.original_source {
+                                                Some(Node::NString(s.clone()))
+                                            } else {
+                                                None
+                                            });
             let mut mappings = String::from("A");
             if mappings_context.unfinished_generated_line != 0 {
                 mappings = String::from(",");

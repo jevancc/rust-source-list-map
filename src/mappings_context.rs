@@ -23,7 +23,15 @@ impl MappingsContext {
         }
     }
 
-    pub fn ensure_source(&mut self, src: String, original_source: Node) -> usize {
+    pub fn ensure_source(&mut self, src: Option<String>, original_source: Option<Node>) -> usize {
+        let src = match src {
+            Some(s) => s,
+            None => String::new(),
+        };
+        let original_source = match original_source {
+            Some(s) => s,
+            None => Node::NString(String::new()),
+        };
         if self.sources_indices.contains_key(&src) {
             *self.sources_indices.get(&src).unwrap()
         } else {
@@ -41,8 +49,10 @@ impl MappingsContext {
         let mut sources: Vec<String> = Vec::new();
         let mut sources_content: Vec<Node> = Vec::new();
         for (key, val) in self.sources_content.clone() {
-            sources.push(key);
-            sources_content.push(val);
+            if !key.is_empty() {
+                sources.push(key);
+                sources_content.push(val);
+            }
         }
         Srcs {
             sources,

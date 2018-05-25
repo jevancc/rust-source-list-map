@@ -1,3 +1,6 @@
+extern crate serde;
+extern crate serde_json;
+extern crate serde_derive;
 extern crate vlq;
 
 use std::collections::HashMap;
@@ -12,13 +15,13 @@ pub struct SourceListMap {
 }
 
 impl SourceListMap {
-    pub fn new(generated_code: Option<GenCode>, source: &str, original_source: &str) -> Self {
+    pub fn new(generated_code: Option<GenCode>, source: Option<String>, original_source: Option<String>) -> Self {
         match generated_code {
             Some(GenCode::Code(c)) => {
                 let mut slm = SourceListMap {
                     children: Vec::new()
                 };
-                slm.add(c, String::from(source), String::from(original_source));
+                slm.add(c, source, original_source);
                 slm
             }
             Some(GenCode::CodeVec(cv)) => SourceListMap {
@@ -30,11 +33,11 @@ impl SourceListMap {
         }
     }
 
-    pub fn add(&mut self, generated_code: Node, source: String, original_source: String)
+    pub fn add(&mut self, generated_code: Node, source: Option<String>, original_source: Option<String>)
               -> &mut SourceListMap {
         match generated_code {
             Node::NString(s) => {
-                if !source.is_empty() {
+                if source != None {
                     self.children
                         .push(Node::NSourceNode(SourceNode::new(s,
                                                                 source,
@@ -75,11 +78,11 @@ impl SourceListMap {
         self
     }
 
-    pub fn prepend(&mut self, generated_code: Node, source: String, original_source: String)
+    pub fn prepend(&mut self, generated_code: Node, source: Option<String>, original_source: Option<String>)
                   -> &mut SourceListMap {
         match generated_code {
             Node::NString(s) => {
-                if source.len() == 0 {
+                if source == None {
                     self.children
                         .insert(0, Node::NSourceNode(SourceNode::new(s,
                                                                      original_source,
@@ -188,7 +191,7 @@ impl SourceListMap {
                 }
             }
         }
-        SourceListMap::new(Some(GenCode::CodeVec(optimized_nodes)), "", "")
+        SourceListMap::new(Some(GenCode::CodeVec(optimized_nodes)), None, None)
     }
 
     pub fn to_string(&self) -> String {
@@ -236,7 +239,7 @@ impl SourceListMap {
         StringWithSrcMap {
             source: src,
             map: SrcMap {
-                version: String::from("3"),
+                version: 3,
                 file: file,
                 sources: arrays.sources,
                 sources_content: if mc.has_source_content {
@@ -269,7 +272,7 @@ pub struct StringWithSrcMap {
 
 #[derive(Debug)]
 pub struct SrcMap {
-    pub version: String,
+    pub version: i32,
     pub file: String,
     pub sources: Vec<String>,
     pub sources_content: Vec<String>,
@@ -287,17 +290,18 @@ impl PartialEq for StringWithSrcMap {
 #[cfg(debug_assertions)]
 impl PartialEq for SrcMap {
     fn eq(&self, other: &SrcMap) -> bool {
+        let blank_str = String::new();
         self.version == other.version &&
         self.file == other.file &&
         self.mappings == other.mappings &&
         self.sources.len() == other.sources.len() &&
         {
-            let mut hm1: HashMap<&String, &String> = HashMap::new();
-            let mut hm2: HashMap<&String, &String> = HashMap::new();
+            let mut hm1: HashMap<&str, &str> = HashMap::new();
+            let mut hm2: HashMap<&str, &str> = HashMap::new();
 
             for i in 0..self.sources.len() {
-                hm1.insert(&self.sources[i], &self.sources_content[i]);
-                hm2.insert(&other.sources[i], &other.sources_content[i]);
+                hm1.insert(&self.sources[i], &self.sources_content.get(i).unwrap_or(&blank_str));
+                hm2.insert(&other.sources[i], &other.sources_content.get(i).unwrap_or(&blank_str));
             }
             hm1 == hm2
         }
