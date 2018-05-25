@@ -7,13 +7,13 @@
     * [x] SingleLineNode
     * [x] MappingsContext
     * [x] SourceListMap
-    * [ ] fromStringWithSourceMap
+    * [x] fromStringWithSourceMap
     * [ ] Optimization
-* [ ] Rust: Test
+* [x] Rust: Test
     * [x] MappingGeneration
     * [x] mapGeneratedCode
-    * [ ] fromStringWithSourceMapTest
-    * [ ] from-to-tests
+    * [x] fromStringWithSourceMapTest
+    * [x] from-to-tests
 * [ ] API: WebAssembly
 * [ ] API: Native
 * [ ] JS: Test
