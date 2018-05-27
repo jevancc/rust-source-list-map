@@ -44,19 +44,19 @@ impl SourceListMap {
                                                                 original_source,
                                                                 1)));
                 } else {
-                    // HACK: use borrow instead of clone
-                    let cloned_children = self.children.clone();
-                    match cloned_children.last() {
-                        Some(Node::NCodeNode(_)) => {
-                            let len = self.children.len();
-                            let mut ln = self.children.get_mut(len - 1).unwrap();
-                            if let Node::NCodeNode(ln) = ln {
-                                ln.add_generated_code(&s);
-                            }
+                    let last_is_code_node =
+                        match self.children.last() {
+                            Some(Node::NCodeNode(_)) => true,
+                            _ => false,
+                        };
+                    if last_is_code_node {
+                        let len = self.children.len();
+                        let mut ln = self.children.get_mut(len - 1).unwrap();
+                        if let Node::NCodeNode(ref mut ln) = ln {
+                            ln.add_generated_code(&s);
                         }
-                        _ => {
-                            self.children.push(Node::NCodeNode(CodeNode::new(s)));
-                        }
+                    } else {
+                        self.children.push(Node::NCodeNode(CodeNode::new(s)));
                     }
                 }
             }
@@ -154,36 +154,35 @@ impl SourceListMap {
                     optimized_nodes.push(n);
                 }
             } else {
-                // TODO: reduce clones
-                let last = optimized_nodes.last().unwrap().clone();
-                let merge_node: Option<Node> = match last {
+                let last = optimized_nodes.pop().unwrap();
+                let merged_node: Result<Node, Node> = match last {
                     Node::NCodeNode(ln) => {
-                        match sln.clone() {
-                            Some(n) => ln.merge(n),
-                            _ => None,
+                        match sln {
+                            Some(ref n) => ln.merge(n),
+                            _ => Err(Node::NCodeNode(ln)),
                         }
                     }
                     Node::NSourceNode(ln) => {
-                        match sln.clone() {
-                            Some(n) => ln.merge(n),
-                            _ => None,
+                        match sln {
+                            Some(ref n) => ln.merge(n),
+                            _ => Err(Node::NSourceNode(ln)),
                         }
                     }
                     Node::NSingleLineNode(ln) => {
-                        match sln.clone() {
-                            Some(n) => ln.merge(n),
-                            _ => None,
+                        match sln {
+                            Some(ref n) => ln.merge(n),
+                            _ => Err(Node::NSingleLineNode(ln)),
                         }
                     }
-                    _ => None
+                    _ => Err(last),
                 };
 
-                match merge_node {
-                    Some(n) => {
-                        optimized_nodes.pop();
+                match merged_node {
+                    Ok(n) => {
                         optimized_nodes.push(n);
                     }
-                    _ => {
+                    Err(n) => {
+                        optimized_nodes.push(n);
                         if let Some(n) = sln {
                             optimized_nodes.push(n);
                         }
@@ -195,7 +194,7 @@ impl SourceListMap {
     }
 
     pub fn to_string(&self) -> String {
-        let mut output = String::from("");
+        let mut output = String::new();
         let children = self.children.clone();
         for child in children {
             match child {
@@ -209,7 +208,7 @@ impl SourceListMap {
     pub fn to_string_with_source_map(&mut self, options_file: Option<String>) -> StringWithSrcMap {
         let mut mc: MappingsContext = MappingsContext::new();
 
-        let mut src: String = String::from("");
+        let mut src: String = String::new();
         for child in &self.children {
             match child {
                 &Node::NCodeNode(ref sln) => src += sln.get_generated_code(),
@@ -220,20 +219,19 @@ impl SourceListMap {
             }
         }
 
-        let mut mappings: String = String::from("");
-        // HACK: use borrow instead of clone
-        for mut child in self.children.clone() {
+        let mut mappings: String = String::new();
+        for child in &self.children {
             match child {
-                Node::NSourceNode(ref mut sln) => mappings += &sln.get_mappings(&mut mc),
-                Node::NCodeNode(ref mut sln) => mappings += &sln.get_mappings(&mut mc),
-                Node::NSingleLineNode(ref mut sln) => mappings += &sln.get_mappings(&mut mc),
+                Node::NSourceNode(ref sln) => mappings += &sln.get_mappings(&mut mc),
+                Node::NCodeNode(ref sln) => mappings += &sln.get_mappings(&mut mc),
+                Node::NSingleLineNode(ref sln) => mappings += &sln.get_mappings(&mut mc),
                 _ => {}
             };
         }
 
         let file = match options_file {
             Some(s) => s,
-            None => String::from(""),
+            None => String::new(),
         };
         let arrays = mc.get_arrays();
         StringWithSrcMap {
@@ -279,7 +277,6 @@ pub struct SrcMap {
     pub mappings: String,
 }
 
-#[cfg(debug_assertions)]
 impl PartialEq for StringWithSrcMap {
     fn eq(&self, other: &StringWithSrcMap) -> bool {
         self.source == other.source &&
@@ -287,7 +284,6 @@ impl PartialEq for StringWithSrcMap {
     }
 }
 
-#[cfg(debug_assertions)]
 impl PartialEq for SrcMap {
     fn eq(&self, other: &SrcMap) -> bool {
         let blank_str = String::new();

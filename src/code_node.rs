@@ -26,13 +26,13 @@ impl CodeNode {
         CodeNode::new(generated_code)
 	}
 
-    pub fn merge(mut self, other_node: Node) -> Option<Node> {
+    pub fn merge(mut self, other_node: &Node) -> Result<Node, Node> {
         match other_node {
             Node::NCodeNode(n) => {
                 self.generated_code += &n.generated_code;
-                Some(Node::NCodeNode(self))
+                Ok(Node::NCodeNode(self))
             }
-            _ => None,
+            _ => Err(Node::NCodeNode(self)),
         }
     }
 
@@ -40,7 +40,7 @@ impl CodeNode {
         &self.generated_code
     }
 
-    pub fn get_mappings(&mut self, mappings_context: &mut MappingsContext) -> String {
+    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
         let lines = helpers::number_of_lines(&self.generated_code);
         let mut mappings: String = ";".repeat(lines);
 
@@ -55,7 +55,7 @@ impl CodeNode {
             if prev_unfinished == 0 && mappings_context.unfinished_generated_line > 0 {
                 mappings = String::from("A");
             } else {
-                mappings = String::from("");
+                mappings = String::new();
             }
         }
         mappings

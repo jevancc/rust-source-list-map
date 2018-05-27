@@ -42,7 +42,7 @@ impl SourceNode {
         None
     }
 
-    pub fn merge(self, other_node: Node) -> Option<Node> {
+    pub fn merge(self, other_node: &Node) -> Result<Node, Node> {
         match other_node {
             Node::NSourceNode(n) => {
                 self.merge_source_node(n)
@@ -50,36 +50,36 @@ impl SourceNode {
             Node::NSingleLineNode(n) => {
                 self.merge_single_line_node(n)
             }
-            _ => None,
+            _ => Err(Node::NSourceNode(self)),
         }
     }
 
-    fn merge_source_node(mut self, other_node: SourceNode) -> Option<Node> {
+    fn merge_source_node(mut self, other_node: &SourceNode) -> Result<Node, Node> {
         if self.source == other_node.source &&
            self._ends_with_new_line &&
            self.starting_line + self._number_of_lines == other_node.starting_line {
             self.generated_code += &other_node.generated_code;
             self._number_of_lines += other_node._number_of_lines;
             self._ends_with_new_line = other_node._ends_with_new_line;
-            Some(Node::NSourceNode(self))
+            Ok(Node::NSourceNode(self))
         } else {
-            None
+            Err(Node::NSourceNode(self))
         }
     }
 
-    fn merge_single_line_node(mut self, other_node: SingleLineNode) -> Option<Node> {
+    fn merge_single_line_node(mut self, other_node: &SingleLineNode) -> Result<Node, Node> {
         if self.source == other_node.source &&
            self._ends_with_new_line &&
            self.starting_line + self._number_of_lines == other_node.line &&
            other_node._number_of_lines <= 1 {
             self.add_single_line_node(other_node);
-            Some(Node::NSourceNode(self))
+            Ok(Node::NSourceNode(self))
         } else {
-            None
+            Err(Node::NSourceNode(self))
         }
     }
 
-    fn add_single_line_node(&mut self, other_node: SingleLineNode) -> &SourceNode {
+    fn add_single_line_node(&mut self, other_node: &SingleLineNode) -> &SourceNode {
         self.generated_code += &other_node.generated_code;
         self._number_of_lines += other_node._number_of_lines;
         self._ends_with_new_line = other_node._ends_with_new_line;
@@ -90,9 +90,9 @@ impl SourceNode {
         &self.generated_code
     }
 
-    pub fn get_mappings(&mut self, mappings_context: &mut MappingsContext) -> String {
+    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
         if self.generated_code.is_empty() {
-            String::from("")
+            String::new()
         } else {
             let line_mapping = ";AACA";
             let lines = self._number_of_lines;

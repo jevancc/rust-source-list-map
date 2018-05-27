@@ -7,3 +7,6 @@ serde = "1.0.59"
 serde_derive = "1.0.59"
 serde_json = "1.0.17"
 vlq = "0.5.1"
+
+[profile.test]
+opt-level = 3

@@ -39,35 +39,35 @@ impl SingleLineNode {
                             self.line)
 	}
 
-    pub fn merge(self, other_node: Node) -> Option<Node> {
+    pub fn merge(self, other_node: &Node) -> Result<Node, Node> {
         match other_node {
             Node::NSingleLineNode(n) => {
                 self.merge_single_line_node(n)
             }
-            _ => None,
+            _ => Err(Node::NSingleLineNode(self)),
         }
     }
 
-    fn merge_single_line_node(mut self, other_node: SingleLineNode) -> Option<Node> {
+    fn merge_single_line_node(mut self, other_node: &SingleLineNode) -> Result<Node, Node> {
         if self.source == other_node.source &&
            self.original_source == other_node.original_source {
             if self.line == other_node.line {
                 self.generated_code += &other_node.generated_code;
                 self._number_of_lines += other_node._number_of_lines;
                 self._ends_with_new_line = other_node._ends_with_new_line;
-                Some(Node::NSingleLineNode(self))
+                Ok(Node::NSingleLineNode(self))
             } else if self.line + 1 == other_node.line && self._ends_with_new_line &&
                       self._number_of_lines == 1 &&
                       other_node._number_of_lines <= 1 {
-                Some(Node::NSourceNode(SourceNode::new(self.generated_code + &other_node.generated_code,
+                Ok(Node::NSourceNode(SourceNode::new(self.generated_code + &other_node.generated_code,
                                                        self.source,
                                                        self.original_source,
                                                        self.line)))
             } else {
-                None
+                Err(Node::NSingleLineNode(self))
             }
         } else {
-            None
+            Err(Node::NSingleLineNode(self))
         }
     }
 
@@ -82,9 +82,9 @@ impl SingleLineNode {
         &self.generated_code
     }
 
-    pub fn get_mappings(&mut self, mappings_context: &mut MappingsContext) -> String {
+    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
         if self.generated_code.is_empty() {
-            String::from("")
+            String::new()
         } else {
             let line_mapping = ";AAAA";
             let lines = self._number_of_lines;

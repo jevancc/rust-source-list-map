@@ -46,6 +46,5 @@ mod mapping_generation {
 		let result1 = map1.to_string_with_source_map(Some(g_Str("test.txt")));
 		let result2 = map2.to_string_with_source_map(Some(g_Str("test.txt")));
         assert_eq!(result1, result2);
-        assert!(true);
     }
 }
