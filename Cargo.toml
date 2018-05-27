@@ -1,6 +1,6 @@
 [package]
 authors = ["Jevan Chan <jevan.cnchan@gmail.com>"]
-name = "source_list_map"
+name = "source-list-map"
 version = "0.1.0"
 [dependencies]
 serde = "1.0.59"
