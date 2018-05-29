@@ -1,8 +1,3 @@
-extern crate serde;
-extern crate serde_json;
-extern crate serde_derive;
-extern crate vlq;
-
 use std::collections::HashMap;
 use code_node::CodeNode;
 use source_node::SourceNode;
@@ -115,7 +110,7 @@ impl SourceListMap {
         self
     }
 
-    pub fn map_generated_code(&mut self, f: &Fn(String) -> String) -> SourceListMap {
+    pub fn map_generated_code(&self, f: &Fn(String) -> String) -> SourceListMap {
         let mut normalized_nodes: Vec<Node> = Vec::new();
         let children = self.children.clone();
 
@@ -262,13 +257,13 @@ pub enum GenCode {
     CodeVec(Vec<Node>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StringWithSrcMap {
     pub source: String,
     pub map: SrcMap,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SrcMap {
     pub version: i32,
     pub file: String,

@@ -1,3 +1,6 @@
 /target
 **/*.rs.bk
 Cargo.lock
+/wasm-api/Cargo.lock
+/wasm-api/target
+/wasm-api/build
