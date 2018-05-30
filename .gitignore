@@ -1,6 +1,9 @@
-/target
+target
 **/*.rs.bk
 Cargo.lock
-/wasm-api/Cargo.lock
-/wasm-api/target
-/wasm-api/build
+wasm-api/Cargo.lock
+wasm-api/target
+wasm-api/build
+node_modules
+package-lock.json
+wasm-release/build

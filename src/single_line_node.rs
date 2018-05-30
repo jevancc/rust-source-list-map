@@ -2,8 +2,9 @@ extern crate vlq;
 
 use std::str;
 use helpers;
-use mappings_context::MappingsContext;
 use source_node::SourceNode;
+use mappings_context::MappingsContext;
+use mapping_functions::mapping_function;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -31,8 +32,8 @@ impl SingleLineNode {
         }
     }
 
-    pub fn map_generated_code(&self, f: &Fn(String) -> String) -> SingleLineNode {
-		let generated_code = f(self.clone().generated_code);
+    pub fn map_generated_code(&self, fn_name: &str) -> SingleLineNode {
+		let generated_code = mapping_function(fn_name)(self.clone().generated_code);
         SingleLineNode::new(generated_code,
                             self.source.clone(),
                             self.original_source.clone(),

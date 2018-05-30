@@ -5,6 +5,9 @@ extern crate source_list_map;
 extern crate serde;
 extern crate serde_json;
 
+#[macro_use]
+extern crate serde_derive;
+
 use wasm_bindgen::prelude::*;
 use source_list_map::*;
 
@@ -15,7 +18,7 @@ pub struct _CodeNode {
 
 #[wasm_bindgen]
 impl _CodeNode {
-    pub fn _new(generated_code: String) -> _CodeNode {
+    pub fn _new_String(generated_code: String) -> _CodeNode {
         _CodeNode {
             value: CodeNode::new(generated_code),
         }
@@ -35,16 +38,16 @@ pub struct _SourceNode {
 
 #[wasm_bindgen]
 impl _SourceNode {
-    pub fn _new_String(generated_code: String) -> _SourceNode {
+    pub fn _new_String_Null_Null_Number(generated_code: String, starting_line: u32) -> _SourceNode {
         _SourceNode {
-            value: SourceNode::new(generated_code, None, None, 1),
+            value: SourceNode::new(generated_code, None, None, starting_line as usize),
         }
     }
 
     pub fn _new_String_String_String_Number(generated_code: String,
                                             source: String,
                                             original_source: String,
-                                            starting_line: i32)
+                                            starting_line: u32)
                                             -> _SourceNode {
         _SourceNode {
             value: SourceNode::new(generated_code,
@@ -68,7 +71,7 @@ pub struct _SingleLineNode {
 
 #[wasm_bindgen]
 impl _SingleLineNode {
-    pub fn _new_String_Null_Null_Number(generated_code: String, starting_line: i32) -> _SingleLineNode {
+    pub fn _new_String_Null_Null_Number(generated_code: String, starting_line: u32) -> _SingleLineNode {
         _SingleLineNode {
             value: SingleLineNode::new(generated_code, None, None, starting_line as usize),
         }
@@ -77,7 +80,7 @@ impl _SingleLineNode {
     pub fn _new_String_String_String_Number(generated_code: String,
                                            source: String,
                                            original_source: String,
-                                           starting_line: i32)
+                                           starting_line: u32)
                                            -> _SingleLineNode {
         _SingleLineNode {
             value: SingleLineNode::new(generated_code,
@@ -138,13 +141,27 @@ impl _SourceListMap {
         self.value.to_string()
     }
 
-    pub fn _to_string_with_source_map_String(&mut self, options_file: String) -> String {
-        let obj = self.value.to_string_with_source_map(Some(options_file));
-        serde_json::to_string(&obj).unwrap()
+    pub fn _to_string_with_source_map(&mut self) -> String {
+        let obj = self.value.to_string_with_source_map(None);
+        serde_json::to_string(&JsStringWithSrcMap {
+            source: obj.source,
+            map: JsSrcMap::from_srcmap(&obj.map),
+        }).unwrap()
     }
 
-    // pub fn _map_generated_code(&self, fn_name: String) -> _SourceListMap {
-    // }
+    pub fn _to_string_with_source_map_String(&mut self, options_file: String) -> String {
+        let obj = self.value.to_string_with_source_map(Some(options_file));
+        serde_json::to_string(&JsStringWithSrcMap {
+            source: obj.source,
+            map: JsSrcMap::from_srcmap(&obj.map),
+        }).unwrap()
+    }
+
+    pub fn _map_generated_code(&self, fn_name: String) -> _SourceListMap {
+        _SourceListMap {
+            value: self.value.map_generated_code(&fn_name),
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -200,19 +217,55 @@ impl NodeVec {
         self.value.push(Node::NString(s));
     }
 
-    pub fn push_SourceNode(&mut self, sn: _SourceNode) {
-        self.value.push(Node::NSourceNode(sn.value));
+    pub fn push_SourceNode(&mut self, sn: &_SourceNode) {
+        self.value.push(Node::NSourceNode(sn.value.clone()));
     }
 
-    pub fn push_CodeNode(&mut self, cn: _CodeNode) {
-        self.value.push(Node::NCodeNode(cn.value));
+    pub fn push_CodeNode(&mut self, cn: &_CodeNode) {
+        self.value.push(Node::NCodeNode(cn.value.clone()));
     }
 
-    pub fn push_SingleLineNode(&mut self, sln: _SingleLineNode) {
-        self.value.push(Node::NSingleLineNode(sln.value));
+    pub fn push_SingleLineNode(&mut self, sln: &_SingleLineNode) {
+        self.value.push(Node::NSingleLineNode(sln.value.clone()));
     }
 
-    pub fn push_SourceListMap(&mut self, slp: _SourceListMap) {
-        self.value.push(Node::NSourceListMap(slp.value));
+    pub fn push_SourceListMap(&mut self, slp: &_SourceListMap) {
+        self.value.push(Node::NSourceListMap(slp.value.clone()));
+    }
+}
+
+#[derive(Serialize)]
+struct JsStringWithSrcMap {
+    pub source: String,
+    pub map: JsSrcMap,
+}
+
+#[derive(Serialize)]
+struct JsSrcMap {
+    pub version: i32,
+    pub file: String,
+    pub sources: Option<Vec<Option<String>>>,
+    pub sourcesContent: Option<Vec<String>>,
+    pub mappings: String,
+}
+
+impl JsSrcMap {
+    // TODO: Reduce clones
+    pub fn from_srcmap(srcmap: &SrcMap) -> JsSrcMap {
+        JsSrcMap {
+            version: srcmap.version,
+            file: srcmap.file.clone(),
+            sources: if srcmap.sources.is_empty() {
+                Some(vec![None])
+            } else {
+                Some(srcmap.sources.clone().into_iter().map(|s| Some(s)).collect())
+            },
+            sourcesContent: if srcmap.sources_content.is_empty() {
+                None
+            } else {
+                Some(srcmap.sources_content.clone())
+            },
+            mappings: srcmap.mappings.clone(),
+        }
     }
 }

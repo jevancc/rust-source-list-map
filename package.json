@@ -1,0 +1,27 @@
+{
+  "name": "source-list-map",
+  "version": "0.1.0",
+  "description": "Fast line to line SourceMap generator.",
+  "main": "wasm-release/index.js",
+  "scripts": {
+    "test": "mocha tests-js/MappingGeneration.js",
+    "build-wasm": "node scripts/buildWebAssembly.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jevan0307/rust-source-list-map.git"
+  },
+  "keywords": [
+    "source-map"
+  ],
+  "author": "Jevan Chan <jevan.cnchan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jevan0307/rust-source-list-map/issues"
+  },
+  "homepage": "https://github.com/jevan0307/rust-source-list-map#readme",
+  "devDependencies": {
+    "mocha": "^2.2.1",
+    "should": "^5.2.0"
+  }
+}

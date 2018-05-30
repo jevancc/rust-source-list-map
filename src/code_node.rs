@@ -3,6 +3,7 @@ extern crate vlq;
 use std::str;
 use helpers;
 use mappings_context::MappingsContext;
+use mapping_functions::mapping_function;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -21,8 +22,8 @@ impl CodeNode {
 		self.generated_code += generated_code;
 	}
 
-    pub fn map_generated_code(&self, f: &Fn(String) -> String) -> CodeNode {
-        let generated_code = f(self.clone().generated_code);
+    pub fn map_generated_code(&self, fn_name: &str) -> CodeNode {
+        let generated_code = mapping_function(fn_name)(self.clone().generated_code);
         CodeNode::new(generated_code)
 	}
 

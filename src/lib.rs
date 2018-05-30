@@ -5,9 +5,10 @@ mod source_node;
 mod code_node;
 mod single_line_node;
 mod mappings_context;
-mod helpers;
 mod source_list_map;
 mod from_string_with_source_map;
+mod mapping_functions;
+mod helpers;
 
 pub use code_node::CodeNode;
 pub use source_node::SourceNode;

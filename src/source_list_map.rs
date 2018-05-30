@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use code_node::CodeNode;
 use source_node::SourceNode;
 use mappings_context::MappingsContext;
+use mapping_functions::mapping_function;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -110,7 +111,7 @@ impl SourceListMap {
         self
     }
 
-    pub fn map_generated_code(&self, f: &Fn(String) -> String) -> SourceListMap {
+    pub fn map_generated_code(&self, fn_name: &str) -> SourceListMap {
         let mut normalized_nodes: Vec<Node> = Vec::new();
         let children = self.children.clone();
 
@@ -138,9 +139,9 @@ impl SourceListMap {
         let mut optimized_nodes: Vec<Node> = Vec::new();
         for nodes in normalized_nodes {
             let sln = match nodes {
-                Node::NCodeNode(n) => Some(Node::NCodeNode(n.map_generated_code(f))),
-                Node::NSourceNode(n) => Some(Node::NSourceNode(n.map_generated_code(f).unwrap())),
-                Node::NSingleLineNode(n) => Some(Node::NSingleLineNode(n.map_generated_code(f))),
+                Node::NCodeNode(n) => Some(Node::NCodeNode(n.map_generated_code(fn_name))),
+                Node::NSourceNode(n) => Some(Node::NSourceNode(n.map_generated_code(fn_name).unwrap())),
+                Node::NSingleLineNode(n) => Some(Node::NSingleLineNode(n.map_generated_code(fn_name))),
                 _ => None,
             };
 
@@ -257,13 +258,13 @@ pub enum GenCode {
     CodeVec(Vec<Node>),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct StringWithSrcMap {
     pub source: String,
     pub map: SrcMap,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct SrcMap {
     pub version: i32,
     pub file: String,
@@ -272,29 +273,29 @@ pub struct SrcMap {
     pub mappings: String,
 }
 
-impl PartialEq for StringWithSrcMap {
-    fn eq(&self, other: &StringWithSrcMap) -> bool {
-        self.source == other.source &&
-        self.map == other.map
-    }
-}
-
-impl PartialEq for SrcMap {
-    fn eq(&self, other: &SrcMap) -> bool {
-        let blank_str = String::new();
-        self.version == other.version &&
-        self.file == other.file &&
-        self.mappings == other.mappings &&
-        self.sources.len() == other.sources.len() &&
-        {
-            let mut hm1: HashMap<&str, &str> = HashMap::new();
-            let mut hm2: HashMap<&str, &str> = HashMap::new();
-
-            for i in 0..self.sources.len() {
-                hm1.insert(&self.sources[i], &self.sources_content.get(i).unwrap_or(&blank_str));
-                hm2.insert(&other.sources[i], &other.sources_content.get(i).unwrap_or(&blank_str));
-            }
-            hm1 == hm2
-        }
-    }
-}
+// impl PartialEq for StringWithSrcMap {
+//     fn eq(&self, other: &StringWithSrcMap) -> bool {
+//         self.source == other.source &&
+//         self.map == other.map
+//     }
+// }
+//
+// impl PartialEq for SrcMap {
+//     fn eq(&self, other: &SrcMap) -> bool {
+//         let blank_str = String::new();
+//         self.version == other.version &&
+//         self.file == other.file &&
+//         self.mappings == other.mappings &&
+//         self.sources.len() == other.sources.len() &&
+//         {
+//             let mut hm1: HashMap<&str, &str> = HashMap::new();
+//             let mut hm2: HashMap<&str, &str> = HashMap::new();
+//
+//             for i in 0..self.sources.len() {
+//                 hm1.insert(&self.sources[i], &self.sources_content.get(i).unwrap_or(&blank_str));
+//                 hm2.insert(&other.sources[i], &other.sources_content.get(i).unwrap_or(&blank_str));
+//             }
+//             hm1 == hm2
+//         }
+//     }
+// }
