@@ -9,12 +9,12 @@ class SingleLineNode extends wasm._SingleLineNode {
         if (generatedCode) {
             startingLine = startingLine || 1;
             if (source) {
-                this.ptr = SingleLineNode._new_String_String_String_Number(generatedCode,
+                this.ptr = SingleLineNode._new_string_string_string_number(generatedCode,
                     source,
                     originalSource,
                     startingLine).ptr;
             } else {
-                this.ptr = SingleLineNode._new_String_Null_Null_Number(generatedCode,
+                this.ptr = SingleLineNode._new_ntring_null_null_number(generatedCode,
                     startingLine).ptr;
             }
         }

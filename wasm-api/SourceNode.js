@@ -9,12 +9,12 @@ class SourceNode extends wasm._SourceNode {
         if (generatedCode) {
             startingLine = startingLine || 1;
             if (source) {
-                this.ptr = SourceNode._new_String_String_String_Number(generatedCode,
+                this.ptr = SourceNode._new_string_string_string_number(generatedCode,
                     source,
                     originalSource,
                     startingLine).ptr;
             } else {
-                this.ptr = SourceNode._new_String_Null_Null_Number(generatedCode,
+                this.ptr = SourceNode._new_string_null_null_number(generatedCode,
                     startingLine).ptr;
             }
         }

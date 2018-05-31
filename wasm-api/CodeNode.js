@@ -7,7 +7,7 @@ class CodeNode extends wasm._CodeNode {
     constructor(generatedCode) {
         super(0);
         if (generatedCode) {
-            this.ptr = CodeNode._new_String(generatedCode).ptr;
+            this.ptr = CodeNode._new_string(generatedCode).ptr;
         }
 	}
 

@@ -71,12 +71,12 @@ impl SingleLineNode {
         }
     }
 
-    fn add_single_line_node(&mut self, other_node: SingleLineNode) {
-        // self.generated_code += &other_node.generated_code;
-        // self.number_of_lines += other_node.number_of_lines;
-        // self.ends_with_new_line = other_node.ends_with_new_line;
-        // self
-    }
+    // fn add_single_line_node(&mut self, other_node: SingleLineNode) {
+    //     self.generated_code += &other_node.generated_code;
+    //     self.number_of_lines += other_node.number_of_lines;
+    //     self.ends_with_new_line = other_node.ends_with_new_line;
+    //     self
+    // }
 
     pub fn get_generated_code(&self) -> &str {
         &self.generated_code

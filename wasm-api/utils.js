@@ -10,7 +10,7 @@ exports.StringVec = function StringVec(strs) {
     var stringVec = wasm.StringVec.new();
     for (var i = 0; i < strs.length; i++) {
         if (typeof strs[i] === "string")
-            stringVec.push_String(strs[i]);
+            stringVec.push_string(strs[i]);
     }
     return stringVec;
 }
@@ -19,15 +19,15 @@ exports.NodeVec = function NodeVec(nodes) {
     var nodeVec = wasm.NodeVec.new();
     for (var i = 0; i < nodes.length; i++) {
         if (typeof nodes[i] === "string")
-            nodeVec.push_String(nodes[i]);
+            nodeVec.push_string(nodes[i]);
         else if (nodes[i] instanceof CodeNode)
-            nodeVec.push_CodeNode(nodes[i]);
+            nodeVec.push_codenode(nodes[i]);
         else if (nodes[i] instanceof SourceNode)
-            nodeVec.push_SourceNode(nodes[i]);
+            nodeVec.push_sourcenode(nodes[i]);
         else if (nodes[i] instanceof SingleLineNode)
-            nodeVec.push_SingleLineNode(nodes[i]);
+            nodeVec.push_singlelinenode(nodes[i]);
         else if (nodes[i] instanceof SourceListMap)
-            nodeVec.push_SourceListMap(nodes[i]);
+            nodeVec.push_sourcelistmap(nodes[i]);
         else
             throw("Invalid node type");
     }

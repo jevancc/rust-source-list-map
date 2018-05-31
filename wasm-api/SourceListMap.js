@@ -14,7 +14,7 @@ class SourceListMap extends wasm._SourceListMap {
         if (generatedCode !== -1) {
             if(Array.isArray(generatedCode)) {
     			var nodes = NodeVec(generatedCode);
-                this.ptr = SourceListMap._new_Nodes(nodes);
+                this.ptr = SourceListMap._new_nodes(nodes);
     		} else {
     			this.ptr = SourceListMap._new().ptr;
                 if (generatedCode || source) {
@@ -27,18 +27,18 @@ class SourceListMap extends wasm._SourceListMap {
 	add(generatedCode, source, originalSource) {
         var nodes = NodeVec([generatedCode]);
         if (source) {
-            this._add_Node_String_String(nodes, source, originalSource);
+            this._add_node_string_string(nodes, source, originalSource);
         } else {
-            this._add_Node(nodes);
+            this._add_node(nodes);
         }
 	};
 
     prepend(generatedCode, source, originalSource) {
         var nodes = NodeVec([generatedCode]);
         if (source) {
-            this._prepend_Node_String_String(nodes, source, originalSource);
+            this._prepend_node_string_string(nodes, source, originalSource);
         } else {
-            this._prepend_Node(nodes);
+            this._prepend_node(nodes);
         }
 	};
 
@@ -54,7 +54,7 @@ class SourceListMap extends wasm._SourceListMap {
 
 	toStringWithSourceMap(options) {
         if (options.file) {
-            return JSON.parse(this._to_string_with_source_map_String(options.file));
+            return JSON.parse(this._to_string_with_source_map_string(options.file));
         } else {
             return JSON.parse(this._to_string_with_source_map());
         }

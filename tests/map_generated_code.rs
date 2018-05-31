@@ -31,20 +31,20 @@ mod map_generated_code {
 		].join("\n");
 
 		map.add(Node::NString(source.clone() + "\n"),
-                Some(g_Str("file.txt")),
+                Some(g_str("file.txt")),
                 Some(source.clone() + "\n"));
         map.add(Node::NString(source.clone() + "\n"),
-                Some(g_Str("file.txt")),
+                Some(g_str("file.txt")),
                 Some(source.clone() + "\n"));
         map.add(Node::NString(source.clone() + "\n"),
                 None,
                 None);
         map.add(Node::NString(source.clone()),
-                Some(g_Str("file.txt")),
+                Some(g_str("file.txt")),
                 Some(source.clone() + "\n"));
 
 		let mut new_map = map.map_generated_code("map_generated_code_test");
-		let result = new_map.to_string_with_source_map(Some(g_Str("test.txt")));
+		let result = new_map.to_string_with_source_map(Some(g_str("test.txt")));
 		let expected_part = vec![
 			"AACA",
 			"AAEA",
@@ -88,9 +88,9 @@ mod map_generated_code {
         let source = "MyLine\n".repeat(10000);
 
         let mut map = SourceListMap::new(None, None, None);
-        map.add(Node::NString(source.clone()), Some(g_Str("file.txt")), Some(source.clone()));
+        map.add(Node::NString(source.clone()), Some(g_str("file.txt")), Some(source.clone()));
         let mut new_map = map.map_generated_code("identical");
-        let result = new_map.to_string_with_source_map(Some(g_Str("test.txt")));
+        let result = new_map.to_string_with_source_map(Some(g_str("test.txt")));
 
         assert_eq!(result.source, source);
         assert_eq!(result.map.sources_content[0], source);

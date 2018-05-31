@@ -1,8 +1,6 @@
-use std::collections::HashMap;
 use code_node::CodeNode;
 use source_node::SourceNode;
 use mappings_context::MappingsContext;
-use mapping_functions::mapping_function;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -139,8 +137,8 @@ impl SourceListMap {
         let mut optimized_nodes: Vec<Node> = Vec::new();
         for nodes in normalized_nodes {
             let sln = match nodes {
+                // Node::NSourceNode(n) => Some(Node::NSourceNode(n.map_generated_code(fn_name)),
                 Node::NCodeNode(n) => Some(Node::NCodeNode(n.map_generated_code(fn_name))),
-                Node::NSourceNode(n) => Some(Node::NSourceNode(n.map_generated_code(fn_name).unwrap())),
                 Node::NSingleLineNode(n) => Some(Node::NSingleLineNode(n.map_generated_code(fn_name))),
                 _ => None,
             };

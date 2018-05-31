@@ -2,7 +2,6 @@ use std::str;
 use helpers;
 use single_line_node::SingleLineNode;
 use mappings_context::MappingsContext;
-use mapping_functions::mapping_function;
 use Node;
 use vlq;
 
@@ -38,9 +37,8 @@ impl SourceNode {
         self._ends_with_new_line = code.ends_with("\n");
     }
 
-    pub fn map_generated_code(&self, fn_name: &str) -> Option<SourceNode> {
-        None
-    }
+    // pub fn map_generated_code(&self, fn_name: &str) -> SourceNode {
+    // }
 
     pub fn merge(self, other_node: &Node) -> Result<Node, Node> {
         match other_node {
