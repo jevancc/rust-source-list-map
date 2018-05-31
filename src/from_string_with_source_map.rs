@@ -1,10 +1,9 @@
-extern crate vlq;
-
 use source_node::SourceNode;
 use code_node::CodeNode;
 use source_list_map::SourceListMap;
 use source_list_map::GenCode;
 use Node;
+use vlq;
 
 pub fn from_string_with_source_map(code: &str,
                                    sources: Vec<&str>,

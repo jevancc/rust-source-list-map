@@ -5,8 +5,8 @@ var SourceListMap = require("./SourceListMap");
 var StringVec = require("./utils").StringVec;
 
 module.exports = function fromStringWithSourceMap(code, map) {
-    var sources = StringVec(map.sources);
-	var sourcesContent = StringVec(map.sourcesContent);
+    var sources = StringVec(map.sources || []);
+	var sourcesContent = StringVec(map.sourcesContent || []);
     var mappings = map.mappings;
 
     var slp = new SourceListMap(-1);
@@ -15,7 +15,5 @@ module.exports = function fromStringWithSourceMap(code, map) {
         sourcesContent,
         mappings).ptr;
 
-    sources.free();
-    sourcesContent.free();
     return slp;
 }

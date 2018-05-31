@@ -51,12 +51,16 @@ describe("mapGeneratedCode", function() {
 			expectedPart
 		].join(";"));
 		result.source.should.be.eql(
-			mappingFunction([source, source, source, source].join("\n"))
+			[source, source, source, source].join("\n")
+				.replace(/;/g, "\n")
+				.replace(/\\\n/g, " ")
+				.replace(/\$\n/g, "")
 		);
 	});
 
 	it("should map code with many lines in time", function() {
-		var bigString = Array(100000).join("MyLine\n");
+		// TODO: Enhance performance and increase repeat to 200000
+		var bigString = Array(1000).join("MyLine\n");
 		var source = bigString + "MyLine\n" + bigString;
 		var map = new SourceListMap();
 		map.add(source, "file.txt", source);

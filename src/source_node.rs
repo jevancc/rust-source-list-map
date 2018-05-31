@@ -1,11 +1,10 @@
-extern crate vlq;
-
 use std::str;
 use helpers;
 use single_line_node::SingleLineNode;
 use mappings_context::MappingsContext;
 use mapping_functions::mapping_function;
 use Node;
+use vlq;
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {

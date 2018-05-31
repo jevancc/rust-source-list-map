@@ -272,30 +272,3 @@ pub struct SrcMap {
     pub sources_content: Vec<String>,
     pub mappings: String,
 }
-
-// impl PartialEq for StringWithSrcMap {
-//     fn eq(&self, other: &StringWithSrcMap) -> bool {
-//         self.source == other.source &&
-//         self.map == other.map
-//     }
-// }
-//
-// impl PartialEq for SrcMap {
-//     fn eq(&self, other: &SrcMap) -> bool {
-//         let blank_str = String::new();
-//         self.version == other.version &&
-//         self.file == other.file &&
-//         self.mappings == other.mappings &&
-//         self.sources.len() == other.sources.len() &&
-//         {
-//             let mut hm1: HashMap<&str, &str> = HashMap::new();
-//             let mut hm2: HashMap<&str, &str> = HashMap::new();
-//
-//             for i in 0..self.sources.len() {
-//                 hm1.insert(&self.sources[i], &self.sources_content.get(i).unwrap_or(&blank_str));
-//                 hm2.insert(&other.sources[i], &other.sources_content.get(i).unwrap_or(&blank_str));
-//             }
-//             hm1 == hm2
-//         }
-//     }
-// }

@@ -29,7 +29,6 @@ class SourceListMap extends wasm._SourceListMap {
         if (source) {
             this._add_Node_String_String(nodes, source, originalSource);
         } else {
-            console.log('addding node: ', JSON.stringify(generatedCode), nodes);
             this._add_Node(nodes);
         }
 	};

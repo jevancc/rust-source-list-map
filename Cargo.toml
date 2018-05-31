@@ -3,6 +3,7 @@ authors = ["Jevan Chan <jevan.cnchan@gmail.com>"]
 name = "source-list-map"
 version = "0.1.0"
 [dependencies]
+linked-hash-map = "0.5.1"
 serde = "1.0.59"
 serde_derive = "1.0.59"
 serde_json = "1.0.17"

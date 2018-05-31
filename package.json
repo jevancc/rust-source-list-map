@@ -2,9 +2,9 @@
   "name": "source-list-map",
   "version": "0.1.0",
   "description": "Fast line to line SourceMap generator.",
-  "main": "wasm-release/index.js",
+  "main": "wasm-api",
   "scripts": {
-    "test": "mocha tests-js/MappingGeneration.js",
+    "test": "mocha tests-js -R spec",
     "build-wasm": "node scripts/buildWebAssembly.js"
   },
   "repository": {

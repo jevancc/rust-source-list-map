@@ -14,10 +14,10 @@
     * [x] mapGeneratedCode
     * [x] fromStringWithSourceMapTest
     * [x] from-to-tests
-* [ ] API: WebAssembly
+* [x] API: WebAssembly
 * [ ] API: Native
-* [ ] JS: Test
-* [ ] JS: Release
+* [x] JS: Test
+* [x] JS: Release
 
 ## Reference
 * [webpack](https://github.com/webpack) / [source-list-map](https://github.com/webpack/source-list-map/)

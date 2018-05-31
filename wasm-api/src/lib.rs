@@ -3,13 +3,17 @@
 extern crate wasm_bindgen;
 extern crate source_list_map;
 extern crate serde;
-extern crate serde_json;
 
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate serde_json;
+
+mod utils;
 
 use wasm_bindgen::prelude::*;
 use source_list_map::*;
+use utils::*;
 
 #[wasm_bindgen]
 pub struct _CodeNode {
@@ -143,23 +147,17 @@ impl _SourceListMap {
 
     pub fn _to_string_with_source_map(&mut self) -> String {
         let obj = self.value.to_string_with_source_map(None);
-        serde_json::to_string(&JsStringWithSrcMap {
-            source: obj.source,
-            map: JsSrcMap::from_srcmap(&obj.map),
-        }).unwrap()
+        string_with_srcmap_to_json(&obj).to_string()
     }
 
     pub fn _to_string_with_source_map_String(&mut self, options_file: String) -> String {
         let obj = self.value.to_string_with_source_map(Some(options_file));
-        serde_json::to_string(&JsStringWithSrcMap {
-            source: obj.source,
-            map: JsSrcMap::from_srcmap(&obj.map),
-        }).unwrap()
+        string_with_srcmap_to_json(&obj).to_string()
     }
 
-    pub fn _map_generated_code(&self, fn_name: String) -> _SourceListMap {
+    pub fn _map_generated_code(&self, fn_name: &str) -> _SourceListMap {
         _SourceListMap {
-            value: self.value.map_generated_code(&fn_name),
+            value: self.value.map_generated_code(fn_name),
         }
     }
 }
@@ -231,41 +229,5 @@ impl NodeVec {
 
     pub fn push_SourceListMap(&mut self, slp: &_SourceListMap) {
         self.value.push(Node::NSourceListMap(slp.value.clone()));
-    }
-}
-
-#[derive(Serialize)]
-struct JsStringWithSrcMap {
-    pub source: String,
-    pub map: JsSrcMap,
-}
-
-#[derive(Serialize)]
-struct JsSrcMap {
-    pub version: i32,
-    pub file: String,
-    pub sources: Option<Vec<Option<String>>>,
-    pub sourcesContent: Option<Vec<String>>,
-    pub mappings: String,
-}
-
-impl JsSrcMap {
-    // TODO: Reduce clones
-    pub fn from_srcmap(srcmap: &SrcMap) -> JsSrcMap {
-        JsSrcMap {
-            version: srcmap.version,
-            file: srcmap.file.clone(),
-            sources: if srcmap.sources.is_empty() {
-                Some(vec![None])
-            } else {
-                Some(srcmap.sources.clone().into_iter().map(|s| Some(s)).collect())
-            },
-            sourcesContent: if srcmap.sources_content.is_empty() {
-                None
-            } else {
-                Some(srcmap.sources_content.clone())
-            },
-            mappings: srcmap.mappings.clone(),
-        }
     }
 }
