@@ -17,7 +17,7 @@ function main() {
         "--release"],
         { cwd: CWD });
     utils.run(["wasm-bindgen",
-        "target/wasm32-unknown-unknown/debug/" + CRATE_NAME + ".wasm",
+        "target/wasm32-unknown-unknown/release/" + CRATE_NAME + ".wasm",
         "--out-dir", BUILD_DIR,
         "--nodejs",
         "--no-typescript"],
