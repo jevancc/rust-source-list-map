@@ -5,7 +5,7 @@
   "main": "wasm-api",
   "scripts": {
     "test": "mocha tests-js -R spec",
-    "build-wasm": "node scripts/buildWebAssembly.js"
+    "build:wasm": "node scripts/buildWebAssembly.js"
   },
   "repository": {
     "type": "git",
