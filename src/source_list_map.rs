@@ -191,24 +191,23 @@ impl SourceListMap {
         let mut output = String::new();
         let children = self.children.clone();
         for child in children {
-            match child {
-                Node::NSingleLineNode(sln) => output += sln.get_generated_code(),
-                _ => {}
-            };
+            if let Node::NSingleLineNode(sln) = child {
+                output += sln.get_generated_code();
+            }
         }
         output
     }
 
-    pub fn to_string_with_source_map(&mut self, options_file: Option<String>) -> StringWithSrcMap {
+    pub fn to_string_with_source_map(&self, options_file: Option<String>) -> StringWithSrcMap {
         let mut mc: MappingsContext = MappingsContext::new();
 
         let mut src: String = String::new();
         for child in &self.children {
             match child {
-                &Node::NCodeNode(ref sln) => src += sln.get_generated_code(),
-                &Node::NSourceNode(ref sln) => src += sln.get_generated_code(),
-                &Node::NSingleLineNode(ref sln) => src += sln.get_generated_code(),
-                &Node::NString(ref sln) => src += &sln,
+                Node::NCodeNode(ref sln) => src += sln.get_generated_code(),
+                Node::NSourceNode(ref sln) => src += sln.get_generated_code(),
+                Node::NSingleLineNode(ref sln) => src += sln.get_generated_code(),
+                Node::NString(ref sln) => src += &sln,
                 _ => {}
             }
         }
@@ -232,7 +231,7 @@ impl SourceListMap {
             source: src,
             map: SrcMap {
                 version: 3,
-                file: file,
+                file,
                 sources: arrays.sources,
                 sources_content: if mc.has_source_content {
                     let mut vec = Vec::<String>::new();
@@ -245,7 +244,7 @@ impl SourceListMap {
                 } else {
                     vec![]
                 },
-                mappings: mappings,
+                mappings,
             }
         }
     }

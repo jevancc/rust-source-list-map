@@ -43,7 +43,7 @@ mod map_generated_code {
                 Some(g_str("file.txt")),
                 Some(source.clone() + "\n"));
 
-		let mut new_map = map.map_generated_code("map_generated_code_test");
+		let new_map = map.map_generated_code("map_generated_code_test");
 		let result = new_map.to_string_with_source_map(Some(g_str("test.txt")));
 		let expected_part = vec![
 			"AACA",
@@ -89,7 +89,7 @@ mod map_generated_code {
 
         let mut map = SourceListMap::new(None, None, None);
         map.add(Node::NString(source.clone()), Some(g_str("file.txt")), Some(source.clone()));
-        let mut new_map = map.map_generated_code("identical");
+        let new_map = map.map_generated_code("identical");
         let result = new_map.to_string_with_source_map(Some(g_str("test.txt")));
 
         assert_eq!(result.source, source);

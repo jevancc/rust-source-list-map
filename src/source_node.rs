@@ -22,19 +22,19 @@ impl SourceNode {
                starting_line: usize)
                -> Self {
         SourceNode {
-            _ends_with_new_line: generated_code.ends_with("\n"),
+            _ends_with_new_line: generated_code.ends_with('\n'),
             _number_of_lines: helpers::number_of_lines(&generated_code),
-            generated_code: generated_code,
-            original_source: original_source,
-            source: source,
-            starting_line: starting_line,
+            generated_code,
+            original_source,
+            source,
+            starting_line,
         }
     }
 
     pub fn add_generated_code(&mut self, code: &str) {
         self.generated_code += code;
         self._number_of_lines += helpers::number_of_lines(code);
-        self._ends_with_new_line = code.ends_with("\n");
+        self._ends_with_new_line = code.ends_with('\n');
     }
 
     // pub fn map_generated_code(&self, fn_name: &str) -> SourceNode {
@@ -115,7 +115,7 @@ impl SourceNode {
             vlq::encode(
                 self.starting_line as i64 - mappings_context.current_original_line as i64,
                 &mut buf).unwrap();
-            buf.push('A' as u8);
+            buf.push(b'A');
             mappings += str::from_utf8(&buf).unwrap();
 
             mappings_context.current_source = source_index;

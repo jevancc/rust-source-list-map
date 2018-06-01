@@ -7,7 +7,7 @@ pub fn number_of_lines(s: &str) -> usize {
 }
 
 pub fn get_unfinished_lines(s: &str) -> usize {
-    match s.rfind("\n") {
+    match s.rfind('\n') {
         Some(res) => s.len() - res - 1,
         None => s.len(),
     }

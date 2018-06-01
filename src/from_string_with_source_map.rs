@@ -18,82 +18,79 @@ pub fn from_string_with_source_map(code: &str,
 	let mut current_source_node_line: usize = 0;
 
     for (i, mapping) in mappings.iter().enumerate() {
-        match lines.get(i) {
-            Some(line) => {
-                let line = if i != lines.len() - 1 {
-                    String::from(*line) + "\n"
-                } else {
-                    String::from(*line)
-                };
-                if !mapping.is_empty() {
-                    let mut line_added: bool = false;
-                    let mut rest = mapping.as_bytes().iter().cloned().peekable();
+        if let Some(line) = lines.get(i) {
+            let line = if i != lines.len() - 1 {
+                String::from(*line) + "\n"
+            } else {
+                String::from(*line)
+            };
+            if !mapping.is_empty() {
+                let mut line_added: bool = false;
+                let mut rest = mapping.as_bytes().iter().cloned().peekable();
 
-                    while let Some(_) = rest.peek() {
-                        line_added = {
-                            if let Some(c) = rest.clone().peek() {
-                                if *c != (',' as u8) {
-                                    vlq::decode(&mut rest).unwrap();
-                                }
+                while let Some(_) = rest.peek() {
+                    line_added = {
+                        if let Some(c) = rest.clone().peek() {
+                            if *c != b',' {
+                                vlq::decode(&mut rest).unwrap();
                             }
+                        }
 
-                            match rest.clone().peek() {
-                                None => {
+                        match rest.clone().peek() {
+                            None => {
+                                false
+                            }
+                            Some(c) => {
+                                if *c == b',' {
+                                    rest.next();
                                     false
-                                }
-                                Some(c) => {
-                                    if *c == (',' as u8) {
-                                        rest.next();
-                                        false
-                                    } else {
-                                        let value = vlq::decode(&mut rest).unwrap();
-                                        let source_index = value as usize + current_source_index;
-                                        current_source_index = source_index;
+                                } else {
+                                    let value = vlq::decode(&mut rest).unwrap();
+                                    let source_index = value as usize + current_source_index;
+                                    current_source_index = source_index;
 
-                                        let mut line_position: i64;
-                                        if let Some(c) = rest.clone().peek() {
-                                            if *c != (',' as u8) {
-                                                let value = vlq::decode(&mut rest).unwrap();
-                                                line_position = value + current_line as i64;
-                                                current_line = line_position;
-                                            } else {
-                                                line_position = current_line;
-                                            }
+                                    let mut line_position: i64;
+                                    if let Some(c) = rest.clone().peek() {
+                                        if *c != b',' {
+                                            let value = vlq::decode(&mut rest).unwrap();
+                                            line_position = value + current_line as i64;
+                                            current_line = line_position;
                                         } else {
                                             line_position = current_line;
                                         }
+                                    } else {
+                                        line_position = current_line;
+                                    }
 
-                                        while let Some(c) = rest.clone().peek() {
-                                            if *c != (',' as u8) {
-                                                rest.next();
-                                            } else {
-                                                break;
-                                            }
-                                        }
-
-                                        if !line_added {
-                                            add_source(&mut nodes, &mut current_source_node_line,
-                                                line.clone(),
-                                                sources.get(source_index),
-                                                sources_content.get(source_index),
-                                                line_position as usize);
-                                            true
+                                    while let Some(c) = rest.clone().peek() {
+                                        if *c != b',' {
+                                            rest.next();
                                         } else {
-                                            false
+                                            break;
                                         }
+                                    }
+
+                                    if !line_added {
+                                        add_source(&mut nodes, &mut current_source_node_line,
+                                            line.clone(),
+                                            sources.get(source_index),
+                                            sources_content.get(source_index),
+                                            line_position as usize);
+                                        true
+                                    } else {
+                                        false
                                     }
                                 }
                             }
-                        } || line_added;
-                    }
-                    if !line_added {
-                        add_code(&mut nodes, &mut current_source_node_line, line);
-                    }
-                } else {
+                        }
+                    } || line_added;
+                }
+                if !line_added {
                     add_code(&mut nodes, &mut current_source_node_line, line);
                 }
+            } else {
+                add_code(&mut nodes, &mut current_source_node_line, line);
             }
-            _ => {}
         }
     }
     if mappings.len() < lines.len() {
@@ -104,7 +101,7 @@ pub fn from_string_with_source_map(code: &str,
             add_code(&mut nodes, &mut current_source_node_line, line);
             index += 1;
         }
-        let line = String::from(lines[index..].join("\n"));
+        let line = lines[index..].join("\n");
         add_code(&mut nodes, &mut current_source_node_line, line);
     }
     SourceListMap::new(Some(GenCode::CodeVec(nodes)), None, None)

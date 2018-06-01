@@ -12,7 +12,7 @@ pub struct CodeNode {
 impl CodeNode {
     pub fn new(generated_code: String) -> Self {
         CodeNode {
-            generated_code: generated_code
+            generated_code
         }
     }
 

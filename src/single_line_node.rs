@@ -22,12 +22,12 @@ impl SingleLineNode {
                original_source: Option<String>,
                line: usize) -> Self {
         SingleLineNode {
-            original_source: original_source,
-            source: source,
-            line: line,
+            original_source,
+            source,
+            line,
             _number_of_lines: helpers::number_of_lines(&generated_code),
-            _ends_with_new_line: generated_code.ends_with("\n"),
-            generated_code: generated_code,
+            _ends_with_new_line: generated_code.ends_with('\n'),
+            generated_code,
         }
     }
 
@@ -110,7 +110,7 @@ impl SingleLineNode {
             vlq::encode(
                 self.line as i64 - mappings_context.current_original_line as i64,
                 &mut buf).unwrap();
-            buf.push('A' as u8);
+            buf.push(b'A');
             mappings += str::from_utf8(&buf).unwrap();
 
             mappings_context.current_source = source_index;
