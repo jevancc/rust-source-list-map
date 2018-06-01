@@ -34,7 +34,8 @@ impl MappingsContext {
             if let Some(Node::NString(_)) = original_source {
                 self.has_source_content = true;
             }
-            self.sources.insert(src, (sources_indices_len, original_source));
+            self.sources
+                .insert(src, (sources_indices_len, original_source));
             sources_indices_len
         }
     }

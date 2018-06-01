@@ -1,9 +1,9 @@
-use std::str;
 use helpers;
-use single_line_node::SingleLineNode;
 use mappings_context::MappingsContext;
-use Node;
+use single_line_node::SingleLineNode;
+use std::str;
 use vlq;
+use Node;
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {
@@ -16,11 +16,12 @@ pub struct SourceNode {
 }
 
 impl SourceNode {
-    pub fn new(generated_code: String,
-               source: Option<String>,
-               original_source: Option<String>,
-               starting_line: usize)
-               -> Self {
+    pub fn new(
+        generated_code: String,
+        source: Option<String>,
+        original_source: Option<String>,
+        starting_line: usize,
+    ) -> Self {
         SourceNode {
             _ends_with_new_line: generated_code.ends_with('\n'),
             _number_of_lines: helpers::number_of_lines(&generated_code),
@@ -42,20 +43,17 @@ impl SourceNode {
 
     pub fn merge(self, other_node: &Node) -> Result<Node, Node> {
         match other_node {
-            Node::NSourceNode(n) => {
-                self.merge_source_node(n)
-            }
-            Node::NSingleLineNode(n) => {
-                self.merge_single_line_node(n)
-            }
+            Node::NSourceNode(n) => self.merge_source_node(n),
+            Node::NSingleLineNode(n) => self.merge_single_line_node(n),
             _ => Err(Node::NSourceNode(self)),
         }
     }
 
     fn merge_source_node(mut self, other_node: &SourceNode) -> Result<Node, Node> {
-        if self.source == other_node.source &&
-           self._ends_with_new_line &&
-           self.starting_line + self._number_of_lines == other_node.starting_line {
+        if self.source == other_node.source
+            && self._ends_with_new_line
+            && self.starting_line + self._number_of_lines == other_node.starting_line
+        {
             self.generated_code += &other_node.generated_code;
             self._number_of_lines += other_node._number_of_lines;
             self._ends_with_new_line = other_node._ends_with_new_line;
@@ -66,10 +64,11 @@ impl SourceNode {
     }
 
     fn merge_single_line_node(mut self, other_node: &SingleLineNode) -> Result<Node, Node> {
-        if self.source == other_node.source &&
-           self._ends_with_new_line &&
-           self.starting_line + self._number_of_lines == other_node.line &&
-           other_node._number_of_lines <= 1 {
+        if self.source == other_node.source
+            && self._ends_with_new_line
+            && self.starting_line + self._number_of_lines == other_node.line
+            && other_node._number_of_lines <= 1
+        {
             self.add_single_line_node(other_node);
             Ok(Node::NSourceNode(self))
         } else {
@@ -94,13 +93,14 @@ impl SourceNode {
         } else {
             let line_mapping = ";AACA";
             let lines = self._number_of_lines;
-            let source_index =
-                mappings_context.ensure_source(self.source.clone(),
-                                            if let Some(ref s) = self.original_source {
-                                                Some(Node::NString(s.clone()))
-                                            } else {
-                                                None
-                                            });
+            let source_index = mappings_context.ensure_source(
+                self.source.clone(),
+                if let Some(ref s) = self.original_source {
+                    Some(Node::NString(s.clone()))
+                } else {
+                    None
+                },
+            );
             let mut mappings = String::from("A");
             if mappings_context.unfinished_generated_line != 0 {
                 mappings = String::from(",");
@@ -111,10 +111,12 @@ impl SourceNode {
             let mut buf = Vec::<u8>::new();
             vlq::encode(
                 source_index as i64 - mappings_context.current_source as i64,
-                &mut buf).unwrap();
+                &mut buf,
+            ).unwrap();
             vlq::encode(
                 self.starting_line as i64 - mappings_context.current_original_line as i64,
-                &mut buf).unwrap();
+                &mut buf,
+            ).unwrap();
             buf.push(b'A');
             mappings += str::from_utf8(&buf).unwrap();
 
@@ -152,10 +154,12 @@ impl SourceNode {
                 String::from(line)
             };
 
-            results.push(SingleLineNode::new(line_code,
-                         self.source.clone(),
-                         self.original_source.clone(),
-                         current_line));
+            results.push(SingleLineNode::new(
+                line_code,
+                self.source.clone(),
+                self.original_source.clone(),
+                current_line,
+            ));
             current_line += 1;
         }
         results

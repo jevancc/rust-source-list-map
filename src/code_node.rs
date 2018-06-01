@@ -1,7 +1,7 @@
-use std::str;
 use helpers;
-use mappings_context::MappingsContext;
 use mapping_functions::mapping_function;
+use mappings_context::MappingsContext;
+use std::str;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -11,19 +11,17 @@ pub struct CodeNode {
 
 impl CodeNode {
     pub fn new(generated_code: String) -> Self {
-        CodeNode {
-            generated_code
-        }
+        CodeNode { generated_code }
     }
 
     pub fn add_generated_code(&mut self, generated_code: &str) {
-		self.generated_code += generated_code;
-	}
+        self.generated_code += generated_code;
+    }
 
     pub fn map_generated_code(&self, fn_name: &str) -> CodeNode {
         let generated_code = mapping_function(fn_name)(self.clone().generated_code);
         CodeNode::new(generated_code)
-	}
+    }
 
     pub fn merge(mut self, other_node: &Node) -> Result<Node, Node> {
         match other_node {
@@ -44,13 +42,15 @@ impl CodeNode {
         let mut mappings: String = ";".repeat(lines);
 
         if lines > 0 {
-            mappings_context.unfinished_generated_line = helpers::get_unfinished_lines(&self.generated_code);
+            mappings_context.unfinished_generated_line =
+                helpers::get_unfinished_lines(&self.generated_code);
             if mappings_context.unfinished_generated_line > 0 {
                 mappings += "A";
             }
         } else {
             let prev_unfinished = mappings_context.unfinished_generated_line;
-            mappings_context.unfinished_generated_line += helpers::get_unfinished_lines(&self.generated_code);
+            mappings_context.unfinished_generated_line +=
+                helpers::get_unfinished_lines(&self.generated_code);
             if prev_unfinished == 0 && mappings_context.unfinished_generated_line > 0 {
                 mappings = String::from("A");
             } else {

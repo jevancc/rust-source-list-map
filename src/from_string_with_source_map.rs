@@ -1,21 +1,23 @@
-use source_node::SourceNode;
 use code_node::CodeNode;
-use source_list_map::SourceListMap;
 use source_list_map::GenCode;
-use Node;
+use source_list_map::SourceListMap;
+use source_node::SourceNode;
 use vlq;
+use Node;
 
-pub fn from_string_with_source_map(code: &str,
-                                   sources: Vec<&str>,
-                                   sources_content: Vec<&str>,
-                                   mappings: &str) -> SourceListMap {
-	let mappings: Vec<&str> = mappings.split(';').collect();
-	let lines: Vec<&str> = code.split('\n').collect();
-	let mut nodes: Vec<Node> = vec![];
+pub fn from_string_with_source_map(
+    code: &str,
+    sources: Vec<&str>,
+    sources_content: Vec<&str>,
+    mappings: &str,
+) -> SourceListMap {
+    let mappings: Vec<&str> = mappings.split(';').collect();
+    let lines: Vec<&str> = code.split('\n').collect();
+    let mut nodes: Vec<Node> = vec![];
 
     let mut current_line: i64 = 1;
-	let mut current_source_index: usize = 0;
-	let mut current_source_node_line: usize = 0;
+    let mut current_source_index: usize = 0;
+    let mut current_source_node_line: usize = 0;
 
     for (i, mapping) in mappings.iter().enumerate() {
         if let Some(line) = lines.get(i) {
@@ -37,9 +39,7 @@ pub fn from_string_with_source_map(code: &str,
                         }
 
                         match rest.clone().peek() {
-                            None => {
-                                false
-                            }
+                            None => false,
                             Some(c) => {
                                 if *c == b',' {
                                     rest.next();
@@ -71,11 +71,14 @@ pub fn from_string_with_source_map(code: &str,
                                     }
 
                                     if !line_added {
-                                        add_source(&mut nodes, &mut current_source_node_line,
+                                        add_source(
+                                            &mut nodes,
+                                            &mut current_source_node_line,
                                             line.clone(),
                                             sources.get(source_index),
                                             sources_content.get(source_index),
-                                            line_position as usize);
+                                            line_position as usize,
+                                        );
                                         true
                                     } else {
                                         false
@@ -107,9 +110,7 @@ pub fn from_string_with_source_map(code: &str,
     SourceListMap::new(Some(GenCode::CodeVec(nodes)), None, None)
 }
 
-fn add_code(nodes: &mut Vec<Node>,
-            current_source_node_line: &mut usize,
-            generated_code: String) {
+fn add_code(nodes: &mut Vec<Node>, current_source_node_line: &mut usize, generated_code: String) {
     match nodes.last_mut() {
         Some(Node::NCodeNode(ref mut n)) => {
             n.add_generated_code(&generated_code);
@@ -127,12 +128,14 @@ fn add_code(nodes: &mut Vec<Node>,
     nodes.push(Node::NCodeNode(CodeNode::new(generated_code)));
 }
 
-fn add_source(nodes: &mut Vec<Node>,
-              current_source_node_line: &mut usize,
-              generated_code: String,
-              source: Option<&&str>,
-              original_source: Option<&&str>,
-              line: usize) {
+fn add_source(
+    nodes: &mut Vec<Node>,
+    current_source_node_line: &mut usize,
+    generated_code: String,
+    source: Option<&&str>,
+    original_source: Option<&&str>,
+    line: usize,
+) {
     let source = match source {
         Some(s) => Some(String::from(*s)),
         None => None,
@@ -143,16 +146,17 @@ fn add_source(nodes: &mut Vec<Node>,
     };
 
     if let Some(Node::NSourceNode(ref mut n)) = nodes.last_mut() {
-         if n.source == source &&
-            *current_source_node_line == line {
+        if n.source == source && *current_source_node_line == line {
             n.add_generated_code(&generated_code);
             *current_source_node_line += 1;
             return;
-         }
+        }
     }
-    nodes.push(Node::NSourceNode(SourceNode::new(generated_code,
-                                                 source,
-                                                 original_source,
-                                                 line)));
+    nodes.push(Node::NSourceNode(SourceNode::new(
+        generated_code,
+        source,
+        original_source,
+        line,
+    )));
     *current_source_node_line = line + 1;
 }

@@ -1,17 +1,17 @@
 #![feature(proc_macro, wasm_custom_section, wasm_import_module)]
 
-extern crate wasm_bindgen;
-extern crate source_list_map;
 extern crate serde;
+extern crate source_list_map;
+extern crate wasm_bindgen;
 
 #[macro_use]
 extern crate serde_json;
 
 mod utils;
 
-use wasm_bindgen::prelude::*;
 use source_list_map::*;
 use utils::*;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct _CodeNode {
@@ -27,10 +27,10 @@ impl _CodeNode {
     }
 
     pub fn _clone(&self) -> _CodeNode {
-		_CodeNode {
+        _CodeNode {
             val: self.val.clone(),
         }
-	}
+    }
 }
 
 #[wasm_bindgen]
@@ -46,22 +46,25 @@ impl _SourceNode {
         }
     }
 
-    pub fn _new_string_string_string_number(generated_code: String,
-                                            source: String,
-                                            original_source: String,
-                                            starting_line: u32)
-                                            -> _SourceNode {
+    pub fn _new_string_string_string_number(
+        generated_code: String,
+        source: String,
+        original_source: String,
+        starting_line: u32,
+    ) -> _SourceNode {
         _SourceNode {
-            val: SourceNode::new(generated_code,
-                                   Some(source),
-                                   Some(original_source),
-                                   starting_line as usize),
+            val: SourceNode::new(
+                generated_code,
+                Some(source),
+                Some(original_source),
+                starting_line as usize,
+            ),
         }
     }
 
     pub fn _clone(&self) -> _SourceNode {
         _SourceNode {
-            val: self.val.clone()
+            val: self.val.clone(),
         }
     }
 }
@@ -73,28 +76,34 @@ pub struct _SingleLineNode {
 
 #[wasm_bindgen]
 impl _SingleLineNode {
-    pub fn _new_string_null_null_number(generated_code: String, starting_line: u32) -> _SingleLineNode {
+    pub fn _new_string_null_null_number(
+        generated_code: String,
+        starting_line: u32,
+    ) -> _SingleLineNode {
         _SingleLineNode {
             val: SingleLineNode::new(generated_code, None, None, starting_line as usize),
         }
     }
 
-    pub fn _new_string_string_string_number(generated_code: String,
-                                           source: String,
-                                           original_source: String,
-                                           starting_line: u32)
-                                           -> _SingleLineNode {
+    pub fn _new_string_string_string_number(
+        generated_code: String,
+        source: String,
+        original_source: String,
+        starting_line: u32,
+    ) -> _SingleLineNode {
         _SingleLineNode {
-            val: SingleLineNode::new(generated_code,
-                                       Some(source),
-                                       Some(original_source),
-                                       starting_line as usize),
+            val: SingleLineNode::new(
+                generated_code,
+                Some(source),
+                Some(original_source),
+                starting_line as usize,
+            ),
         }
     }
 
     pub fn _clone(&self) -> _SingleLineNode {
         _SingleLineNode {
-            val: self.val.clone()
+            val: self.val.clone(),
         }
     }
 }
@@ -123,20 +132,28 @@ impl _SourceListMap {
         self.val.add(nv.val[0].clone(), None, None);
     }
 
-    pub fn _add_node_string_string(&mut self, nv: NodeVec, source: String, original_source: String) {
-        self.val.add(nv.val[0].clone(),
-                       Some(source),
-                       Some(original_source));
+    pub fn _add_node_string_string(
+        &mut self,
+        nv: NodeVec,
+        source: String,
+        original_source: String,
+    ) {
+        self.val
+            .add(nv.val[0].clone(), Some(source), Some(original_source));
     }
 
     pub fn _prepend_node(&mut self, nv: NodeVec) {
         self.val.prepend(nv.val[0].clone(), None, None);
     }
 
-    pub fn _prepend_node_string_string(&mut self, nv: NodeVec, source: String, original_source: String) {
-        self.val.prepend(nv.val[0].clone(),
-                       Some(source),
-                       Some(original_source));
+    pub fn _prepend_node_string_string(
+        &mut self,
+        nv: NodeVec,
+        source: String,
+        original_source: String,
+    ) {
+        self.val
+            .prepend(nv.val[0].clone(), Some(source), Some(original_source));
     }
 
     pub fn _to_string(&self) -> String {
@@ -161,11 +178,12 @@ impl _SourceListMap {
 }
 
 #[wasm_bindgen]
-pub fn _from_string_with_source_map(code: &str,
-                                    sources: StringVec,
-                                    sources_content: StringVec,
-                                    mappings: &str)
-                                    -> _SourceListMap {
+pub fn _from_string_with_source_map(
+    code: &str,
+    sources: StringVec,
+    sources_content: StringVec,
+    mappings: &str,
+) -> _SourceListMap {
     let sources = sources.val;
     let sources_content = sources_content.val;
 
@@ -174,21 +192,20 @@ pub fn _from_string_with_source_map(code: &str,
             code,
             sources.iter().map(|s| s.as_str()).collect(),
             sources_content.iter().map(|s| s.as_str()).collect(),
-            mappings)
+            mappings,
+        ),
     }
 }
 
 #[wasm_bindgen]
 pub struct StringVec {
-    val: Vec<String>
+    val: Vec<String>,
 }
 
 #[wasm_bindgen]
 impl StringVec {
     pub fn new() -> StringVec {
-        StringVec {
-            val: Vec::new()
-        }
+        StringVec { val: Vec::new() }
     }
 
     pub fn push_string(&mut self, s: String) {
@@ -204,9 +221,7 @@ pub struct NodeVec {
 #[wasm_bindgen]
 impl NodeVec {
     pub fn new() -> NodeVec {
-        NodeVec {
-            val: Vec::new(),
-        }
+        NodeVec { val: Vec::new() }
     }
 
     pub fn push_string(&mut self, s: String) {

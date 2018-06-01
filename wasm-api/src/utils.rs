@@ -1,5 +1,5 @@
-use source_list_map::*;
 use serde_json::value::Value;
+use source_list_map::*;
 
 pub fn string_with_srcmap_to_json(obj: &StringWithSrcMap) -> Value {
     let mut map = json!({
@@ -15,7 +15,10 @@ pub fn string_with_srcmap_to_json(obj: &StringWithSrcMap) -> Value {
 
     if !obj.map.sources_content.is_empty() {
         if let Value::Object(ref mut m) = map {
-            m.insert(String::from("sourcesContent"),json!(obj.map.sources_content));
+            m.insert(
+                String::from("sourcesContent"),
+                json!(obj.map.sources_content),
+            );
         }
     }
 

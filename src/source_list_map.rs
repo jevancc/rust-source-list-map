@@ -1,6 +1,6 @@
 use code_node::CodeNode;
-use source_node::SourceNode;
 use mappings_context::MappingsContext;
+use source_node::SourceNode;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -9,40 +9,46 @@ pub struct SourceListMap {
 }
 
 impl SourceListMap {
-    pub fn new(generated_code: Option<GenCode>, source: Option<String>, original_source: Option<String>) -> Self {
+    pub fn new(
+        generated_code: Option<GenCode>,
+        source: Option<String>,
+        original_source: Option<String>,
+    ) -> Self {
         match generated_code {
             Some(GenCode::Code(c)) => {
                 let mut slm = SourceListMap {
-                    children: Vec::new()
+                    children: Vec::new(),
                 };
                 slm.add(c, source, original_source);
                 slm
             }
-            Some(GenCode::CodeVec(cv)) => SourceListMap {
-                children: cv
-            },
+            Some(GenCode::CodeVec(cv)) => SourceListMap { children: cv },
             None => SourceListMap {
-                children: Vec::new()
+                children: Vec::new(),
             },
         }
     }
 
-    pub fn add(&mut self, generated_code: Node, source: Option<String>, original_source: Option<String>)
-              -> &mut SourceListMap {
+    pub fn add(
+        &mut self,
+        generated_code: Node,
+        source: Option<String>,
+        original_source: Option<String>,
+    ) -> &mut SourceListMap {
         match generated_code {
             Node::NString(s) => {
                 if source != None {
-                    self.children
-                        .push(Node::NSourceNode(SourceNode::new(s,
-                                                                source,
-                                                                original_source,
-                                                                1)));
+                    self.children.push(Node::NSourceNode(SourceNode::new(
+                        s,
+                        source,
+                        original_source,
+                        1,
+                    )));
                 } else {
-                    let last_is_code_node =
-                        match self.children.last() {
-                            Some(Node::NCodeNode(_)) => true,
-                            _ => false,
-                        };
+                    let last_is_code_node = match self.children.last() {
+                        Some(Node::NCodeNode(_)) => true,
+                        _ => false,
+                    };
                     if last_is_code_node {
                         let len = self.children.len();
                         let mut ln = self.children.get_mut(len - 1).unwrap();
@@ -72,33 +78,29 @@ impl SourceListMap {
         self
     }
 
-    pub fn prepend(&mut self, generated_code: Node, source: Option<String>, original_source: Option<String>)
-                  -> &mut SourceListMap {
+    pub fn prepend(
+        &mut self,
+        generated_code: Node,
+        source: Option<String>,
+        original_source: Option<String>,
+    ) -> &mut SourceListMap {
         match generated_code {
             Node::NString(s) => {
                 if source == None {
-                    self.children
-                        .insert(0, Node::NSourceNode(SourceNode::new(s,
-                                                                     original_source,
-                                                                     source,
-                                                                     1)));
+                    self.children.insert(
+                        0,
+                        Node::NSourceNode(SourceNode::new(s, original_source, source, 1)),
+                    );
                 }
                 // TODO: branch for last child node with preprendGeneratedCode
                 // else if !self.children.is_empty() {}
                 else {
-                    self.children
-                        .insert(0, Node::NCodeNode(CodeNode::new(s)));
+                    self.children.insert(0, Node::NCodeNode(CodeNode::new(s)));
                 }
             }
-            Node::NCodeNode(cn) => {
-                self.children.insert(0, Node::NCodeNode(cn))
-            }
-            Node::NSourceNode(sn) => {
-                self.children.insert(0, Node::NSourceNode(sn))
-            }
-            Node::NSingleLineNode(sln) => {
-                self.children.insert(0, Node::NSingleLineNode(sln))
-            }
+            Node::NCodeNode(cn) => self.children.insert(0, Node::NCodeNode(cn)),
+            Node::NSourceNode(sn) => self.children.insert(0, Node::NSourceNode(sn)),
+            Node::NSingleLineNode(sln) => self.children.insert(0, Node::NSingleLineNode(sln)),
             Node::NSourceListMap(mut slm) => {
                 let mut new_childern = Vec::<Node>::new();
                 new_childern.append(&mut slm.children);
@@ -139,7 +141,9 @@ impl SourceListMap {
             let sln = match nodes {
                 // Node::NSourceNode(n) => Some(Node::NSourceNode(n.map_generated_code(fn_name)),
                 Node::NCodeNode(n) => Some(Node::NCodeNode(n.map_generated_code(fn_name))),
-                Node::NSingleLineNode(n) => Some(Node::NSingleLineNode(n.map_generated_code(fn_name))),
+                Node::NSingleLineNode(n) => {
+                    Some(Node::NSingleLineNode(n.map_generated_code(fn_name)))
+                }
                 _ => None,
             };
 
@@ -150,24 +154,18 @@ impl SourceListMap {
             } else {
                 let last = optimized_nodes.pop().unwrap();
                 let merged_node: Result<Node, Node> = match last {
-                    Node::NCodeNode(ln) => {
-                        match sln {
-                            Some(ref n) => ln.merge(n),
-                            _ => Err(Node::NCodeNode(ln)),
-                        }
-                    }
-                    Node::NSourceNode(ln) => {
-                        match sln {
-                            Some(ref n) => ln.merge(n),
-                            _ => Err(Node::NSourceNode(ln)),
-                        }
-                    }
-                    Node::NSingleLineNode(ln) => {
-                        match sln {
-                            Some(ref n) => ln.merge(n),
-                            _ => Err(Node::NSingleLineNode(ln)),
-                        }
-                    }
+                    Node::NCodeNode(ln) => match sln {
+                        Some(ref n) => ln.merge(n),
+                        _ => Err(Node::NCodeNode(ln)),
+                    },
+                    Node::NSourceNode(ln) => match sln {
+                        Some(ref n) => ln.merge(n),
+                        _ => Err(Node::NSourceNode(ln)),
+                    },
+                    Node::NSingleLineNode(ln) => match sln {
+                        Some(ref n) => ln.merge(n),
+                        _ => Err(Node::NSingleLineNode(ln)),
+                    },
                     _ => Err(last),
                 };
 
@@ -245,7 +243,7 @@ impl SourceListMap {
                     vec![]
                 },
                 mappings,
-            }
+            },
         }
     }
 }
