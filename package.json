@@ -5,7 +5,8 @@
   "main": "wasm-api",
   "scripts": {
     "test": "mocha tests-js -R spec",
-    "build:wasm": "node scripts/buildWebAssembly.js"
+    "build:wasm": "node scripts/buildWebAssembly.js",
+    "pretty": "prettier --write \"wasm-api/**/*.js\" \"test-js/**/*.js\" \"scripts/**/*.js\""
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   "homepage": "https://github.com/jevan0307/rust-source-list-map#readme",
   "devDependencies": {
     "mocha": "^2.2.1",
+    "prettier": "1.13.4",
     "should": "^5.2.0"
   }
 }
