@@ -13,15 +13,20 @@ function main() {
         fs.mkdirSync(BUILD_DIR);
     }
 
+    var options = {
+        cwd: CWD,
+        stdio: "inherit"
+    };
+
     utils.run(["cargo", "build", "--target", "wasm32-unknown-unknown",
         "--release"],
-        { cwd: CWD });
+        options);
     utils.run(["wasm-bindgen",
         "target/wasm32-unknown-unknown/release/" + CRATE_NAME + ".wasm",
         "--out-dir", BUILD_DIR,
         "--nodejs",
         "--no-typescript"],
-        { cwd: CWD });
+        options);
 }
 
 main();
