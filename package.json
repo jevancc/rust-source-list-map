@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/jevan0307/rust-source-list-map#readme",
   "devDependencies": {
-    "mocha": "^2.2.1",
+    "mocha": "^5.2.0",
     "prettier": "1.13.4",
     "should": "^5.2.0"
   }
