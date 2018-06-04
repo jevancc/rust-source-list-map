@@ -7,7 +7,7 @@ extern crate vlq;
 mod code_node;
 mod from_string_with_source_map;
 mod helpers;
-mod mapping_functions;
+mod mapping_function;
 mod mappings_context;
 mod single_line_node;
 mod source_list_map;
@@ -15,6 +15,7 @@ mod source_node;
 
 pub use code_node::CodeNode;
 pub use from_string_with_source_map::from_string_with_source_map;
+pub use mapping_function::MappingFunction;
 pub use mappings_context::MappingsContext;
 pub use single_line_node::SingleLineNode;
 pub use source_list_map::GenCode;

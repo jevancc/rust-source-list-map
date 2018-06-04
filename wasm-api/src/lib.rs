@@ -7,8 +7,10 @@ extern crate wasm_bindgen;
 #[macro_use]
 extern crate serde_json;
 
+mod mapping_functions;
 mod utils;
 
+use mapping_functions::*;
 use source_list_map::*;
 use utils::*;
 use wasm_bindgen::prelude::*;
@@ -171,9 +173,15 @@ impl _SourceListMap {
     }
 
     pub fn _map_generated_code(&self, fn_name: &str) -> _SourceListMap {
-        _SourceListMap {
-            val: self.val.map_generated_code(fn_name),
-        }
+        let mut test_mapping_function = TestMappingFunction {};
+        let mut identical_function = IdenticalFunction {};
+
+        let map = match fn_name {
+            "map_generated_code_test" => self.val.map_generated_code(&mut test_mapping_function),
+            _ => self.val.map_generated_code(&mut identical_function),
+        };
+
+        _SourceListMap { val: map }
     }
 }
 

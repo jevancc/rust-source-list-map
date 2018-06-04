@@ -1,7 +1,7 @@
 use helpers;
-use mapping_functions::mapping_function;
 use mappings_context::MappingsContext;
 use std::str;
+use MappingFunction;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -18,8 +18,8 @@ impl CodeNode {
         self.generated_code += generated_code;
     }
 
-    pub fn map_generated_code(&self, fn_name: &str) -> CodeNode {
-        let generated_code = mapping_function(fn_name)(self.clone().generated_code);
+    pub fn map_generated_code<T: MappingFunction>(&self, mf: &mut T) -> CodeNode {
+        let generated_code = mf.map(self.clone().generated_code);
         CodeNode::new(generated_code)
     }
 

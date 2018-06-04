@@ -39,7 +39,12 @@ mod from_string_with_source_map {
                 &map.mappings,
             );
             let result = slm.to_string_with_source_map(Some(map.file.clone()));
-            assert_eq!(result.map, expected_map, "Failed on: {}", item);
+            assert_eq!(
+                result.map,
+                Some(expected_map.clone()),
+                "Failed on: {}",
+                item
+            );
             assert_eq!(result.source, generated_code, "Failed on: {}", item);
 
             let mut slm = from_string_with_source_map(
@@ -53,7 +58,12 @@ mod from_string_with_source_map {
                 &expected_map.mappings,
             );
             let result = slm.to_string_with_source_map(Some(map.file.clone()));
-            assert_eq!(result.map, expected_map, "Failed on: {}", item);
+            assert_eq!(
+                result.map,
+                Some(expected_map.clone()),
+                "Failed on: {}",
+                item
+            );
             assert_eq!(result.source, generated_code, "Failed on: {}", item);
         }
     }

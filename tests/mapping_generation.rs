@@ -29,7 +29,14 @@ mod mapping_generation {
             result.source,
             "Gen\nCode Source\nCode\nGen Code Source\nCode"
         );
-        assert_eq!(result.map.sources_content[0], "Source\nCode\n");
+        assert_eq!(
+            if let Some(map) = result.map {
+                map.sources_content.get(0).unwrap().clone()
+            } else {
+                String::new()
+            },
+            "Source\nCode\n"
+        );
     }
 
     #[test]

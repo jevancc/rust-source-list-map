@@ -127,7 +127,7 @@ impl SourceNode {
             let unfinished_generated_line = helpers::get_unfinished_lines(&self.generated_code);
             mappings_context.unfinished_generated_line = unfinished_generated_line;
             if lines > 0 {
-                mappings += &line_mapping.repeat(lines.wrapping_sub(1));
+                mappings += &line_mapping.repeat(lines.saturating_sub(1));
             }
 
             if unfinished_generated_line == 0 {

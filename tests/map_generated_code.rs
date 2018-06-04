@@ -7,9 +7,26 @@ mod map_generated_code {
     use source_list_map::*;
     use utils::*;
 
+    struct TestMappingFunction;
+    impl MappingFunction for TestMappingFunction {
+        fn map(&mut self, line: String) -> String {
+            line.replace(";", "\n")
+                .replace("\\\n", " ")
+                .replace("$\n", "")
+        }
+    }
+
+    struct IdenticalFunction;
+    impl MappingFunction for IdenticalFunction {
+        fn map(&mut self, line: String) -> String {
+            line
+        }
+    }
+
     #[test]
     fn should_map_generated_code_correctly() {
         let mut map = SourceListMap::new(None, None, None);
+        let mut mf = TestMappingFunction {};
 
         let source: String = vec![
             "Normal Line 1",
@@ -47,7 +64,7 @@ mod map_generated_code {
             Some(source.clone() + "\n"),
         );
 
-        let new_map = map.map_generated_code("map_generated_code_test");
+        let new_map = map.map_generated_code(&mut mf);
         let result = new_map.to_string_with_source_map(Some(g_str("test.txt")));
         let expected_part = vec![
             "AACA",
@@ -64,7 +81,11 @@ mod map_generated_code {
         ].join(";");
 
         assert_eq!(
-            result.map.mappings,
+            if let Some(map) = result.map {
+                map.mappings
+            } else {
+                String::new()
+            },
             vec![
                 "AAAA",
                 &expected_part,
@@ -94,6 +115,7 @@ mod map_generated_code {
     fn should_map_code_with_many_lines_in_time() {
         // TODO: Enhance performance and increase repeat to 200000
         let source = "MyLine\n".repeat(10000);
+        let mut mf = IdenticalFunction {};
 
         let mut map = SourceListMap::new(None, None, None);
         map.add(
@@ -101,10 +123,17 @@ mod map_generated_code {
             Some(g_str("file.txt")),
             Some(source.clone()),
         );
-        let new_map = map.map_generated_code("identical");
+        let new_map = map.map_generated_code(&mut mf);
         let result = new_map.to_string_with_source_map(Some(g_str("test.txt")));
 
         assert_eq!(result.source, source);
-        assert_eq!(result.map.sources_content[0], source);
+        assert_eq!(
+            if let Some(map) = result.map {
+                map.sources_content.get(0).unwrap().clone()
+            } else {
+                String::new()
+            },
+            source
+        );
     }
 }

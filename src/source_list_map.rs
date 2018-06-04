@@ -1,6 +1,7 @@
 use code_node::CodeNode;
 use mappings_context::MappingsContext;
 use source_node::SourceNode;
+use MappingFunction;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -111,7 +112,7 @@ impl SourceListMap {
         self
     }
 
-    pub fn map_generated_code(&self, fn_name: &str) -> SourceListMap {
+    pub fn map_generated_code<T: MappingFunction>(&self, mf: &mut T) -> SourceListMap {
         let mut normalized_nodes: Vec<Node> = Vec::new();
         let children = self.children.clone();
 
@@ -140,10 +141,8 @@ impl SourceListMap {
         for nodes in normalized_nodes {
             let sln = match nodes {
                 // Node::NSourceNode(n) => Some(Node::NSourceNode(n.map_generated_code(fn_name)),
-                Node::NCodeNode(n) => Some(Node::NCodeNode(n.map_generated_code(fn_name))),
-                Node::NSingleLineNode(n) => {
-                    Some(Node::NSingleLineNode(n.map_generated_code(fn_name)))
-                }
+                Node::NCodeNode(n) => Some(Node::NCodeNode(n.map_generated_code(mf))),
+                Node::NSingleLineNode(n) => Some(Node::NSingleLineNode(n.map_generated_code(mf))),
                 _ => None,
             };
 
@@ -227,7 +226,7 @@ impl SourceListMap {
         let arrays = mc.get_arrays();
         StringWithSrcMap {
             source: src,
-            map: SrcMap {
+            map: Some(SrcMap {
                 version: 3,
                 file,
                 sources: arrays.sources,
@@ -243,7 +242,7 @@ impl SourceListMap {
                     vec![]
                 },
                 mappings,
-            },
+            }),
         }
     }
 }
@@ -256,10 +255,10 @@ pub enum GenCode {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct StringWithSrcMap {
     pub source: String,
-    pub map: SrcMap,
+    pub map: Option<SrcMap>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SrcMap {
     pub version: i32,
     pub file: String,

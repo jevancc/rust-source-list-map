@@ -1,9 +1,9 @@
 use helpers;
-use mapping_functions::mapping_function;
 use mappings_context::MappingsContext;
 use source_node::SourceNode;
 use std::str;
 use vlq;
+use MappingFunction;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -33,8 +33,8 @@ impl SingleLineNode {
         }
     }
 
-    pub fn map_generated_code(&self, fn_name: &str) -> SingleLineNode {
-        let generated_code = mapping_function(fn_name)(self.clone().generated_code);
+    pub fn map_generated_code<T: MappingFunction>(&self, mf: &mut T) -> SingleLineNode {
+        let generated_code = mf.map(self.clone().generated_code);
         SingleLineNode::new(
             generated_code,
             self.source.clone(),
