@@ -11,20 +11,21 @@ pub fn from_string_with_source_map(
     sources_content: Vec<&str>,
     mappings: &str,
 ) -> SourceListMap {
-    let mappings: Vec<&str> = mappings.split(';').collect();
-    let lines: Vec<&str> = code.split('\n').collect();
+    let mappings = mappings.split(';').enumerate();
+    let mut lines = code.split('\n').enumerate();
+    let lines_count = lines.clone().count();
     let mut nodes: Vec<Node> = vec![];
 
     let mut current_line: i64 = 1;
     let mut current_source_index: usize = 0;
     let mut current_source_node_line: usize = 0;
 
-    for (i, mapping) in mappings.iter().enumerate() {
-        if let Some(line) = lines.get(i) {
-            let line = if i != lines.len() - 1 {
-                String::from(*line) + "\n"
+    for (i, mapping) in mappings {
+        if let Some((_, line)) = lines.next() {
+            let line = if i != lines_count - 1 {
+                String::from(line) + "\n"
             } else {
-                String::from(*line)
+                String::from(line)
             };
             if !mapping.is_empty() {
                 let mut line_added: bool = false;
@@ -96,16 +97,21 @@ pub fn from_string_with_source_map(
             }
         }
     }
-    if mappings.len() < lines.len() {
-        let lines_len = lines.len();
-        let mut index = mappings.len();
-        while index < lines_len - 1 && lines[index].trim().is_empty() {
-            let line = String::from(lines[index]) + "\n";
+
+    let mut last = String::new();
+    while let Some((i, line)) = lines.next() {
+        if i < lines_count - 1 && line.trim().is_empty() {
+            let line = String::from(line) + "\n";
             add_code(&mut nodes, &mut current_source_node_line, line);
-            index += 1;
+        } else {
+            last += line;
+            while let Some((_, line)) = lines.next() {
+                last += "\n";
+                last += line;
+            }
+            add_code(&mut nodes, &mut current_source_node_line, last);
+            break;
         }
-        let line = lines[index..].join("\n");
-        add_code(&mut nodes, &mut current_source_node_line, line);
     }
     SourceListMap::new(Some(GenCode::CodeVec(nodes)), None, None)
 }
