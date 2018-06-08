@@ -18,8 +18,8 @@ impl CodeNode {
         self.generated_code += generated_code;
     }
 
-    pub fn map_generated_code<T: MappingFunction>(&self, mf: &mut T) -> CodeNode {
-        let generated_code = mf.map(self.clone().generated_code);
+    pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> CodeNode {
+        let generated_code = mf.map(self.generated_code);
         CodeNode::new(generated_code)
     }
 

@@ -195,8 +195,7 @@ impl SourceListMap {
 
     pub fn to_string(&self) -> String {
         let mut output = String::new();
-        let children = self.children.clone();
-        for child in children {
+        for child in &self.children {
             if let Node::NSingleLineNode(sln) = child {
                 output += sln.get_generated_code();
             }
@@ -228,10 +227,7 @@ impl SourceListMap {
             };
         }
 
-        let file = match options_file {
-            Some(s) => s,
-            None => String::new(),
-        };
+        let file = options_file.map_or(String::new(), |s| s);
         let arrays = mc.get_arrays();
         StringWithSrcMap {
             source: src,

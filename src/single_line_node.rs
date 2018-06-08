@@ -38,8 +38,8 @@ impl SingleLineNode {
         }
     }
 
-    pub fn map_generated_code<T: MappingFunction>(&self, mf: &mut T) -> SingleLineNode {
-        let generated_code = mf.map(self.clone().generated_code);
+    pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> SingleLineNode {
+        let generated_code = mf.map(self.generated_code);
         SingleLineNode::new(
             generated_code,
             self.source.clone().map(|p| StringPtr::Ptr(p)),
