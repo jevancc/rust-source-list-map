@@ -2,8 +2,10 @@ use code_node::CodeNode;
 use source_list_map::GenCode;
 use source_list_map::SourceListMap;
 use source_node::SourceNode;
+use std::rc::Rc;
 use vlq;
 use Node;
+use StringPtr;
 
 pub fn from_string_with_source_map(
     code: &str,
@@ -142,17 +144,16 @@ fn add_source(
     original_source: Option<&&str>,
     line: usize,
 ) {
-    let source = match source {
-        Some(s) => Some(String::from(*s)),
-        None => None,
-    };
-    let original_source = match original_source {
-        Some(s) => Some(String::from(*s)),
-        None => None,
-    };
+    let source = source.map(|s| String::from(*s));
+    let original_source = original_source.map(|s| String::from(*s));
 
     if let Some(Node::NSourceNode(ref mut n)) = nodes.last_mut() {
-        if n.source == source && *current_source_node_line == line {
+        if ((n.source.is_none() && source.is_none()) || {
+            let ns = Rc::into_raw(n.source.clone().unwrap());
+            let s = source.clone().unwrap();
+            unsafe { *ns == s }
+        }) && *current_source_node_line == line
+        {
             n.add_generated_code(&generated_code);
             *current_source_node_line += 1;
             return;
@@ -160,8 +161,8 @@ fn add_source(
     }
     nodes.push(Node::NSourceNode(SourceNode::new(
         generated_code,
-        source,
-        original_source,
+        source.map(|s| StringPtr::Str(s)),
+        original_source.map(|s| StringPtr::Str(s)),
         line,
     )));
     *current_source_node_line = line + 1;

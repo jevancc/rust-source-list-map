@@ -59,8 +59,7 @@ describe("mapGeneratedCode", function() {
 	});
 
 	it("should map code with many lines in time", function() {
-		// TODO: Enhance performance and increase repeat to 200000
-		var bigString = Array(1000).join("MyLine\n");
+		var bigString = Array(200000).join("MyLine\n");
 		var source = bigString + "MyLine\n" + bigString;
 		var map = new SourceListMap();
 		map.add(source, "file.txt", source);

@@ -60,7 +60,7 @@ impl CodeNode {
         mappings
     }
 
-    pub fn get_normalized_nodes(&self) -> Vec<CodeNode> {
-        vec![self.clone()]
+    pub fn get_normalized_nodes(self) -> Vec<CodeNode> {
+        vec![self]
     }
 }

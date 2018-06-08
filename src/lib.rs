@@ -23,12 +23,28 @@ pub use source_list_map::SourceListMap;
 pub use source_list_map::SrcMap;
 pub use source_list_map::StringWithSrcMap;
 pub use source_node::SourceNode;
+use std::rc::Rc;
 
 #[derive(Clone, Debug)]
 pub enum Node {
+    NRcString(Rc<String>),
     NString(String),
     NCodeNode(CodeNode),
     NSourceNode(SourceNode),
     NSingleLineNode(SingleLineNode),
     NSourceListMap(SourceListMap),
+}
+
+pub enum StringPtr {
+    Str(String),
+    Ptr(Rc<String>),
+}
+
+impl StringPtr {
+    pub fn to_ptr(self) -> Rc<String> {
+        match self {
+            StringPtr::Str(s) => Rc::new(s),
+            StringPtr::Ptr(p) => p,
+        }
+    }
 }

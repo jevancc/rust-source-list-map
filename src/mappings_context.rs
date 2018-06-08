@@ -1,4 +1,5 @@
 use linked_hash_map::LinkedHashMap;
+use std::rc::Rc;
 use Node;
 
 #[derive(Clone, Debug)]
@@ -21,19 +22,27 @@ impl MappingsContext {
         }
     }
 
-    pub fn ensure_source(&mut self, src: Option<String>, original_source: Option<Node>) -> usize {
-        let src = match src {
-            Some(s) => s,
-            None => String::new(),
-        };
+    pub fn ensure_source(
+        &mut self,
+        src: Option<Rc<String>>,
+        original_source: Option<Node>,
+    ) -> usize {
+        let src: String = src.map_or(String::new(), |p| (*p).clone());
 
         if self.sources.contains_key(&src) {
             self.sources.get(&src).unwrap().0
         } else {
             let sources_indices_len = self.sources.len();
-            if let Some(Node::NString(_)) = original_source {
-                self.has_source_content = true;
+            match original_source {
+                Some(Node::NString(_)) => {
+                    self.has_source_content = true;
+                }
+                Some(Node::NRcString(_)) => {
+                    self.has_source_content = true;
+                }
+                _ => {}
             }
+
             self.sources
                 .insert(src, (sources_indices_len, original_source));
             sources_indices_len

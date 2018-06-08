@@ -9,3 +9,7 @@ pub fn g_str(s: &str) -> String {
 pub fn g_n_str(s: &str) -> Node {
     Node::NString(String::from(s))
 }
+
+pub fn g_strptr(s: &str) -> StringPtr {
+    StringPtr::Str(String::from(s))
+}

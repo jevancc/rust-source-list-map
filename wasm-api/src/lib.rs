@@ -57,8 +57,8 @@ impl _SourceNode {
         _SourceNode {
             val: SourceNode::new(
                 generated_code,
-                Some(source),
-                Some(original_source),
+                Some(StringPtr::Str(source)),
+                Some(StringPtr::Str(original_source)),
                 starting_line as usize,
             ),
         }
@@ -96,8 +96,8 @@ impl _SingleLineNode {
         _SingleLineNode {
             val: SingleLineNode::new(
                 generated_code,
-                Some(source),
-                Some(original_source),
+                Some(StringPtr::Str(source)),
+                Some(StringPtr::Str(original_source)),
                 starting_line as usize,
             ),
         }
@@ -141,7 +141,7 @@ impl _SourceListMap {
         original_source: String,
     ) {
         self.val
-            .add(nv.val[0].clone(), Some(source), Some(original_source));
+            .add(nv.val[0].clone(), Some(StringPtr::Str(source)), Some(StringPtr::Str(original_source)));
     }
 
     pub fn _prepend_node(&mut self, nv: NodeVec) {
@@ -155,7 +155,7 @@ impl _SourceListMap {
         original_source: String,
     ) {
         self.val
-            .prepend(nv.val[0].clone(), Some(source), Some(original_source));
+            .prepend(nv.val[0].clone(), Some(StringPtr::Str(source)), Some(StringPtr::Str(original_source)));
     }
 
     pub fn _to_string(&self) -> String {
@@ -171,18 +171,19 @@ impl _SourceListMap {
         let obj = self.val.to_string_with_source_map(Some(options_file));
         string_with_srcmap_to_json(&obj).to_string()
     }
+}
 
-    pub fn _map_generated_code(&self, fn_name: &str) -> _SourceListMap {
-        let mut test_mapping_function = TestMappingFunction {};
-        let mut identical_function = IdenticalFunction {};
+#[wasm_bindgen]
+pub fn _sourcelistmap_map_generated_code(slp: _SourceListMap, fn_name: &str) -> _SourceListMap {
+    let mut test_mapping_function = TestMappingFunction {};
+    let mut identical_function = IdenticalFunction {};
 
-        let map = match fn_name {
-            "map_generated_code_test" => self.val.map_generated_code(&mut test_mapping_function),
-            _ => self.val.map_generated_code(&mut identical_function),
-        };
+    let map = match fn_name {
+        "map_generated_code_test" => slp.val.map_generated_code(&mut test_mapping_function),
+        _ => slp.val.map_generated_code(&mut identical_function),
+    };
 
-        _SourceListMap { val: map }
-    }
+    _SourceListMap { val: map }
 }
 
 #[wasm_bindgen]

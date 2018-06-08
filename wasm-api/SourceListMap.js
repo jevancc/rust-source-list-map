@@ -43,7 +43,7 @@ class SourceListMap extends wasm._SourceListMap {
 
     mapGeneratedCode(fnName) {
         var newSlp = new SourceListMap(-1);
-        newSlp.ptr = this._map_generated_code(fnName).ptr;
+        newSlp.ptr = wasm._sourcelistmap_map_generated_code(this, fnName).ptr;
         return newSlp;
     }
 

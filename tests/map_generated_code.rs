@@ -49,19 +49,19 @@ mod map_generated_code {
 
         map.add(
             Node::NString(source.clone() + "\n"),
-            Some(g_str("file.txt")),
-            Some(source.clone() + "\n"),
+            Some(g_strptr("file.txt")),
+            Some(StringPtr::Str(source.clone() + "\n")),
         );
         map.add(
             Node::NString(source.clone() + "\n"),
-            Some(g_str("file.txt")),
-            Some(source.clone() + "\n"),
+            Some(g_strptr("file.txt")),
+            Some(StringPtr::Str(source.clone() + "\n")),
         );
         map.add(Node::NString(source.clone() + "\n"), None, None);
         map.add(
             Node::NString(source.clone()),
-            Some(g_str("file.txt")),
-            Some(source.clone() + "\n"),
+            Some(g_strptr("file.txt")),
+            Some(StringPtr::Str(source.clone() + "\n")),
         );
 
         let new_map = map.map_generated_code(&mut mf);
@@ -81,11 +81,7 @@ mod map_generated_code {
         ].join(";");
 
         assert_eq!(
-            if let Some(map) = result.map {
-                map.mappings
-            } else {
-                String::new()
-            },
+            result.map.mappings,
             vec![
                 "AAAA",
                 &expected_part,
@@ -113,27 +109,19 @@ mod map_generated_code {
 
     #[test]
     fn should_map_code_with_many_lines_in_time() {
-        // TODO: Enhance performance and increase repeat to 200000
-        let source = "MyLine\n".repeat(10000);
+        let source = "MyLine\n".repeat(200000);
         let mut mf = IdenticalFunction {};
 
         let mut map = SourceListMap::new(None, None, None);
         map.add(
             Node::NString(source.clone()),
-            Some(g_str("file.txt")),
-            Some(source.clone()),
+            Some(g_strptr("file.txt")),
+            Some(StringPtr::Str(source.clone())),
         );
         let new_map = map.map_generated_code(&mut mf);
         let result = new_map.to_string_with_source_map(Some(g_str("test.txt")));
 
         assert_eq!(result.source, source);
-        assert_eq!(
-            if let Some(map) = result.map {
-                map.sources_content.get(0).unwrap().clone()
-            } else {
-                String::new()
-            },
-            source
-        );
+        assert_eq!(result.map.sources_content[0], source);
     }
 }

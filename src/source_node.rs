@@ -1,15 +1,17 @@
 use helpers;
 use mappings_context::MappingsContext;
 use single_line_node::SingleLineNode;
+use std::rc::Rc;
 use std::str;
 use vlq;
 use Node;
+use StringPtr;
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {
     pub generated_code: String,
-    pub original_source: Option<String>,
-    pub source: Option<String>,
+    pub original_source: Option<Rc<String>>,
+    pub source: Option<Rc<String>>,
     pub starting_line: usize,
     pub _number_of_lines: usize,
     pub _ends_with_new_line: bool,
@@ -18,10 +20,13 @@ pub struct SourceNode {
 impl SourceNode {
     pub fn new(
         generated_code: String,
-        source: Option<String>,
-        original_source: Option<String>,
+        source: Option<StringPtr>,
+        original_source: Option<StringPtr>,
         starting_line: usize,
     ) -> Self {
+        let source = source.map(|sp| sp.to_ptr());
+        let original_source = original_source.map(|sp| sp.to_ptr());
+
         SourceNode {
             _ends_with_new_line: generated_code.ends_with('\n'),
             _number_of_lines: helpers::number_of_lines(&generated_code),
@@ -95,11 +100,7 @@ impl SourceNode {
             let lines = self._number_of_lines;
             let source_index = mappings_context.ensure_source(
                 self.source.clone(),
-                if let Some(ref s) = self.original_source {
-                    Some(Node::NString(s.clone()))
-                } else {
-                    None
-                },
+                self.original_source.clone().map(|p| Node::NRcString(p)),
             );
             let mut mappings = String::from("A");
             if mappings_context.unfinished_generated_line != 0 {
@@ -156,8 +157,8 @@ impl SourceNode {
 
             results.push(SingleLineNode::new(
                 line_code,
-                self.source.clone(),
-                self.original_source.clone(),
+                self.source.clone().map(|p| StringPtr::Ptr(p)),
+                self.original_source.clone().map(|p| StringPtr::Ptr(p)),
                 current_line,
             ));
             current_line += 1;

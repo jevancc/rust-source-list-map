@@ -3,6 +3,7 @@ use mappings_context::MappingsContext;
 use source_node::SourceNode;
 use MappingFunction;
 use Node;
+use StringPtr;
 
 #[derive(Clone, Debug)]
 pub struct SourceListMap {
@@ -12,8 +13,8 @@ pub struct SourceListMap {
 impl SourceListMap {
     pub fn new(
         generated_code: Option<GenCode>,
-        source: Option<String>,
-        original_source: Option<String>,
+        source: Option<StringPtr>,
+        original_source: Option<StringPtr>,
     ) -> Self {
         match generated_code {
             Some(GenCode::Code(c)) => {
@@ -33,12 +34,16 @@ impl SourceListMap {
     pub fn add(
         &mut self,
         generated_code: Node,
-        source: Option<String>,
-        original_source: Option<String>,
+        source: Option<StringPtr>,
+        original_source: Option<StringPtr>,
     ) -> &mut SourceListMap {
         match generated_code {
+            Node::NRcString(sp) => {
+                let s: String = (*sp).clone();
+                self.add(Node::NString(s), source, original_source);
+            }
             Node::NString(s) => {
-                if source != None {
+                if source.is_some() {
                     self.children.push(Node::NSourceNode(SourceNode::new(
                         s,
                         source,
@@ -82,15 +87,19 @@ impl SourceListMap {
     pub fn prepend(
         &mut self,
         generated_code: Node,
-        source: Option<String>,
-        original_source: Option<String>,
+        source: Option<StringPtr>,
+        original_source: Option<StringPtr>,
     ) -> &mut SourceListMap {
         match generated_code {
+            Node::NRcString(sp) => {
+                let s: String = (*sp).clone();
+                self.prepend(Node::NString(s), source, original_source);
+            }
             Node::NString(s) => {
-                if source == None {
+                if source.is_none() {
                     self.children.insert(
                         0,
-                        Node::NSourceNode(SourceNode::new(s, original_source, source, 1)),
+                        Node::NSourceNode(SourceNode::new(s, source, original_source, 1)),
                     );
                 }
                 // TODO: branch for last child node with preprendGeneratedCode
@@ -112,9 +121,9 @@ impl SourceListMap {
         self
     }
 
-    pub fn map_generated_code<T: MappingFunction>(&self, mf: &mut T) -> SourceListMap {
+    pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> SourceListMap {
         let mut normalized_nodes: Vec<Node> = Vec::new();
-        let children = self.children.clone();
+        let children = self.children;
 
         for child in children {
             match child {
@@ -226,15 +235,17 @@ impl SourceListMap {
         let arrays = mc.get_arrays();
         StringWithSrcMap {
             source: src,
-            map: Some(SrcMap {
+            map: SrcMap {
                 version: 3,
                 file,
                 sources: arrays.sources,
                 sources_content: if mc.has_source_content {
                     let mut vec = Vec::<String>::new();
                     for sc in arrays.sources_content {
-                        if let Node::NString(s) = sc {
-                            vec.push(s);
+                        match sc {
+                            Node::NString(s) => vec.push(s),
+                            Node::NRcString(sp) => vec.push((*sp).clone()),
+                            _ => {}
                         }
                     }
                     vec
@@ -242,7 +253,7 @@ impl SourceListMap {
                     vec![]
                 },
                 mappings,
-            }),
+            },
         }
     }
 }
@@ -255,7 +266,7 @@ pub enum GenCode {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct StringWithSrcMap {
     pub source: String,
-    pub map: Option<SrcMap>,
+    pub map: SrcMap,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

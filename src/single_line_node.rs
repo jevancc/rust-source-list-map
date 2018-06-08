@@ -1,16 +1,18 @@
 use helpers;
 use mappings_context::MappingsContext;
 use source_node::SourceNode;
+use std::rc::Rc;
 use std::str;
 use vlq;
 use MappingFunction;
 use Node;
+use StringPtr;
 
 #[derive(Clone, Debug)]
 pub struct SingleLineNode {
     pub generated_code: String,
-    pub original_source: Option<String>,
-    pub source: Option<String>,
+    pub original_source: Option<Rc<String>>,
+    pub source: Option<Rc<String>>,
     pub line: usize,
     pub _number_of_lines: usize,
     pub _ends_with_new_line: bool,
@@ -19,10 +21,13 @@ pub struct SingleLineNode {
 impl SingleLineNode {
     pub fn new(
         generated_code: String,
-        source: Option<String>,
-        original_source: Option<String>,
+        source: Option<StringPtr>,
+        original_source: Option<StringPtr>,
         line: usize,
     ) -> Self {
+        let source = source.map(|sp| sp.to_ptr());
+        let original_source = original_source.map(|sp| sp.to_ptr());
+
         SingleLineNode {
             original_source,
             source,
@@ -37,8 +42,8 @@ impl SingleLineNode {
         let generated_code = mf.map(self.clone().generated_code);
         SingleLineNode::new(
             generated_code,
-            self.source.clone(),
-            self.original_source.clone(),
+            self.source.clone().map(|p| StringPtr::Ptr(p)),
+            self.original_source.clone().map(|p| StringPtr::Ptr(p)),
             self.line,
         )
     }
@@ -64,8 +69,8 @@ impl SingleLineNode {
             {
                 Ok(Node::NSourceNode(SourceNode::new(
                     self.generated_code + &other_node.generated_code,
-                    self.source,
-                    self.original_source,
+                    self.source.map(|p| StringPtr::Ptr(Rc::clone(&p))),
+                    self.original_source.map(|p| StringPtr::Ptr(Rc::clone(&p))),
                     self.line,
                 )))
             } else {
@@ -95,11 +100,7 @@ impl SingleLineNode {
             let lines = self._number_of_lines;
             let source_index = mappings_context.ensure_source(
                 self.source.clone(),
-                if let Some(ref s) = self.original_source {
-                    Some(Node::NString(s.clone()))
-                } else {
-                    None
-                },
+                self.original_source.clone().map(|p| Node::NRcString(p)),
             );
 
             let mut mappings = String::from("A");
@@ -139,7 +140,7 @@ impl SingleLineNode {
         }
     }
 
-    pub fn get_normalized_nodes(&self) -> Vec<SingleLineNode> {
-        vec![self.clone()]
+    pub fn get_normalized_nodes(self) -> Vec<SingleLineNode> {
+        vec![self]
     }
 }
