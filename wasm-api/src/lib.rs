@@ -4,15 +4,15 @@ extern crate serde;
 extern crate source_list_map;
 extern crate wasm_bindgen;
 
-#[macro_use]
-extern crate serde_json;
+// #[macro_use]
+// extern crate serde_json;
 
 mod mapping_functions;
-mod utils;
+// mod utils;
 
 use mapping_functions::*;
 use source_list_map::*;
-use utils::*;
+// use utils::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -162,14 +162,14 @@ impl _SourceListMap {
         self.val.to_string()
     }
 
-    pub fn _to_string_with_source_map(&mut self) -> String {
-        let obj = self.val.to_string_with_source_map(None);
-        string_with_srcmap_to_json(&obj).to_string()
-    }
-
-    pub fn _to_string_with_source_map_string(&mut self, options_file: String) -> String {
-        let obj = self.val.to_string_with_source_map(Some(options_file));
-        string_with_srcmap_to_json(&obj).to_string()
+    pub fn _to_string_with_source_map(&mut self) -> JsSrcMap {
+        let srcmap = self.val.to_string_with_source_map(None);
+        JsSrcMap {
+            source: srcmap.source,
+            map_sources_content: srcmap.map.sources_content,
+            map_sources: srcmap.map.sources,
+            mappings: srcmap.map.mappings,
+        }
     }
 }
 
@@ -251,5 +251,40 @@ impl NodeVec {
 
     pub fn push_sourcelistmap(&mut self, slp: &_SourceListMap) {
         self.val.push(Node::NSourceListMap(slp.val.clone()));
+    }
+}
+
+#[wasm_bindgen]
+pub struct JsSrcMap {
+    source: String,
+    map_sources: Vec<String>,
+    map_sources_content: Vec<String>,
+    mappings: String,
+}
+
+#[wasm_bindgen]
+impl JsSrcMap {
+    pub fn get_source(&self) -> String {
+        self.source.clone()
+    }
+
+    pub fn get_map_contents_len(&self) -> i32 {
+        self.map_sources_content.len() as i32
+    }
+
+    pub fn get_map_sources_len(&self) -> i32 {
+        self.map_sources.len() as i32
+    }
+
+    pub fn get_map_contents_nth(&self, idx: i32) -> String {
+        self.map_sources_content.get(idx as usize).unwrap().clone()
+    }
+
+    pub fn get_map_sources_nth(&self, idx: i32) -> String {
+        self.map_sources.get(idx as usize).unwrap().clone()
+    }
+
+    pub fn get_mappings(&self) -> String {
+        self.mappings.clone()
     }
 }

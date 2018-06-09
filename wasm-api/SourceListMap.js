@@ -52,13 +52,36 @@ class SourceListMap extends wasm._SourceListMap {
     }
 
     toStringWithSourceMap(options) {
-        if (options.file) {
-            return JSON.parse(
-                this._to_string_with_source_map_string(options.file)
-            );
+        var srcMap = this._to_string_with_source_map();
+        var ret = {
+            source: srcMap.get_source(),
+            map: {
+                file: options.file,
+                version: 3,
+                mappings: srcMap.get_mappings()
+            }
+        };
+
+        var sourcesLen = srcMap.get_map_sources_len();
+        if (sourcesLen > 0) {
+            ret.map.sources = [];
+            for (var i = 0; i < sourcesLen; i++) {
+                ret.map.sources.push(srcMap.get_map_sources_nth(i));
+            }
         } else {
-            return JSON.parse(this._to_string_with_source_map());
+            ret.map.sources = [null];
         }
+
+        var contentsLen = srcMap.get_map_contents_len();
+        if (contentsLen > 0) {
+            ret.map.sourcesContent = []
+            for (var i = 0; i < contentsLen; i++) {
+                ret.map.sourcesContent.push(srcMap.get_map_contents_nth(i));
+            }
+        }
+
+        srcMap.free();
+        return ret;
     }
 }
 
