@@ -74,7 +74,7 @@ class SourceListMap extends wasm._SourceListMap {
 
         var contentsLen = srcMap.get_map_contents_len();
         if (contentsLen > 0) {
-            ret.map.sourcesContent = []
+            ret.map.sourcesContent = [];
             for (var i = 0; i < contentsLen; i++) {
                 ret.map.sourcesContent.push(srcMap.get_map_contents_nth(i));
             }
