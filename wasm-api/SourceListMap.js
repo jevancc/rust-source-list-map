@@ -83,6 +83,26 @@ class SourceListMap extends wasm._SourceListMap {
         srcMap.free();
         return ret;
     }
+
+    toStringWithSourceMapJson(options) {
+        var srcMap = JSON.parse(this._to_string_with_source_map_json());
+        var ret = {
+            source: srcMap.source,
+            map: {
+                file: options.file,
+                version: 3,
+                mappings: srcMap.mappings
+            }
+        };
+
+        ret.map.sources = srcMap.mapSources;
+        if (ret.map.sources.length < 0) {
+            ret.map.sources = [null];
+        }
+
+        ret.map.sourcesContent = srcMap.mapSourcesContent;
+        return ret;
+    }
 }
 
 module.exports = SourceListMap;

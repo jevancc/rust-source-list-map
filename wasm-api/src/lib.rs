@@ -4,8 +4,8 @@ extern crate serde;
 extern crate source_list_map;
 extern crate wasm_bindgen;
 
-// #[macro_use]
-// extern crate serde_json;
+#[macro_use]
+extern crate serde_json;
 
 mod mapping_functions;
 // mod utils;
@@ -170,6 +170,16 @@ impl _SourceListMap {
             map_sources: srcmap.map.sources,
             mappings: srcmap.map.mappings,
         }
+    }
+
+    pub fn _to_string_with_source_map_json(&mut self) -> String {
+        let srcmap = self.val.to_string_with_source_map(None);
+        json!({
+            "source": &srcmap.source,
+            "mapSourcesContent": &srcmap.map.sources_content,
+            "mapSources": &srcmap.map.sources,
+            "mappings": &srcmap.map.mappings,
+        }).to_string()
     }
 }
 

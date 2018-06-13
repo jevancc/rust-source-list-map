@@ -59,12 +59,23 @@ describe("mapGeneratedCode", function() {
 	});
 
 	it("should map code with many lines in time", function() {
-		var bigString = Array(200000).join("MyLine\n");
+		var bigString = Array(100000).join("MyLine\n");
 		var source = bigString + "MyLine\n" + bigString;
 		var map = new SourceListMap();
 		map.add(source, "file.txt", source);
 		var newMap = map.mapGeneratedCode("identical");
 		var result = newMap.toStringWithSourceMap({ file: "test.txt" });
+		result.source.should.be.eql(source);
+		result.map.sourcesContent[0].should.be.eql(source);
+	})
+
+	it("should map code with many lines in time - return JSON", function() {
+		var bigString = Array(100000).join("MyLine\n");
+		var source = bigString + "MyLine\n" + bigString;
+		var map = new SourceListMap();
+		map.add(source, "file.txt", source);
+		var newMap = map.mapGeneratedCode("identical");
+		var result = newMap.toStringWithSourceMapJson({ file: "test.txt" });
 		result.source.should.be.eql(source);
 		result.map.sourcesContent[0].should.be.eql(source);
 	})
