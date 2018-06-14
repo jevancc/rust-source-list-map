@@ -1,5 +1,8 @@
 # rust-source-list-map
 
+## Important Notice
+The WebAssembly API and JS tests have been moved to `rust-webpack-sources`.
+
 ## Todo
 * [ ] Rust: Implementation
     * [x] CodeNode
