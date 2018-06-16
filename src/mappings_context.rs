@@ -53,11 +53,9 @@ impl MappingsContext {
         let mut sources: Vec<String> = Vec::new();
         let mut sources_content: Vec<Node> = Vec::new();
         for (key, val) in self.sources.clone() {
-            if !key.is_empty() {
-                sources.push(key);
-                if let Some(content) = val.1 {
-                    sources_content.push(content);
-                }
+            sources.push(key);
+            if let Some(content) = val.1 {
+                sources_content.push(content);
             }
         }
 
