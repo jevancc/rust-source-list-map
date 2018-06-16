@@ -146,13 +146,17 @@ impl SourceNode {
     pub fn get_normalized_nodes(&self) -> Vec<SingleLineNode> {
         let mut results = Vec::<SingleLineNode>::new();
         let mut current_line = self.starting_line;
-        let mut lines = self.generated_code.lines().peekable();
+        let mut lines = self.generated_code.split('\n').peekable();
 
         while let Some(line) = lines.next() {
-            let line_code = if lines.peek().is_some() || self._ends_with_new_line {
+            let line_code = if lines.peek().is_some() {
                 String::from(line) + "\n"
             } else {
-                String::from(line)
+                if !self._ends_with_new_line {
+                    String::from(line)
+                } else {
+                    break;
+                }
             };
 
             results.push(SingleLineNode::new(
