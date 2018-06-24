@@ -93,6 +93,7 @@ impl SingleLineNode {
     }
 
     pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
+        let mut buf = Vec::<u8>::new();
         if self.generated_code.is_empty() {
             String::new()
         } else {
@@ -105,12 +106,9 @@ impl SingleLineNode {
 
             let mut mappings = String::from("A");
             if mappings_context.unfinished_generated_line != 0 {
-                let mut buf = Vec::<u8>::new();
                 vlq::encode(mappings_context.unfinished_generated_line as i64, &mut buf).unwrap();
                 mappings = String::from(",");
-                mappings += str::from_utf8(&buf).unwrap();
             }
-            let mut buf = Vec::<u8>::new();
             vlq::encode(
                 source_index as i64 - mappings_context.current_source as i64,
                 &mut buf,
@@ -121,6 +119,7 @@ impl SingleLineNode {
             ).unwrap();
             buf.push(b'A');
             mappings += str::from_utf8(&buf).unwrap();
+            buf.clear();
 
             mappings_context.current_source = source_index;
             mappings_context.current_original_line = self.line;

@@ -4,7 +4,7 @@ use Node;
 
 #[derive(Clone, Debug)]
 pub struct MappingsContext {
-    pub sources: LinkedHashMap<String, (usize, Option<Node>)>,
+    pub sources: LinkedHashMap<Option<Rc<String>>, (usize, Option<Node>)>,
     pub has_source_content: bool,
     pub current_original_line: usize,
     pub current_source: usize,
@@ -27,8 +27,6 @@ impl MappingsContext {
         src: Option<Rc<String>>,
         original_source: Option<Node>,
     ) -> usize {
-        let src: String = src.map_or(String::new(), |p| (*p).clone());
-
         if self.sources.contains_key(&src) {
             self.sources.get(&src).unwrap().0
         } else {
@@ -50,7 +48,7 @@ impl MappingsContext {
     }
 
     pub fn get_arrays(&self) -> Srcs {
-        let mut sources: Vec<String> = Vec::new();
+        let mut sources: Vec<Option<Rc<String>>> = Vec::new();
         let mut sources_content: Vec<Node> = Vec::new();
         for (key, val) in self.sources.clone() {
             sources.push(key);
@@ -67,6 +65,6 @@ impl MappingsContext {
 }
 
 pub struct Srcs {
-    pub sources: Vec<String>,
+    pub sources: Vec<Option<Rc<String>>>,
     pub sources_content: Vec<Node>,
 }

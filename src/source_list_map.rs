@@ -234,7 +234,13 @@ impl SourceListMap {
             map: SrcMap {
                 version: 3,
                 file,
-                sources: arrays.sources,
+                sources: arrays.sources.iter().map(|sp| {
+                    if let Some(ref sp) = sp {
+                        (**sp).clone()
+                    } else {
+                        String::new()
+                    }
+                }).collect(),
                 sources_content: if mc.has_source_content {
                     let mut vec = Vec::<String>::new();
                     for sc in arrays.sources_content {
