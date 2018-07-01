@@ -34,8 +34,8 @@ mod from_string_with_source_map {
 
             let mut slm = from_string_with_source_map(
                 &generated_code,
-                map.sources.iter().map(|s| s.as_ref()).collect(),
-                map.sources_content.iter().map(|s| s.as_ref()).collect(),
+                &map.sources.iter().map(|s| s.as_ref()).collect(),
+                &map.sources_content.iter().map(|s| s.as_ref()).collect(),
                 &map.mappings,
             );
             let result = slm.to_string_with_source_map(Some(map.file.clone()));
@@ -44,8 +44,8 @@ mod from_string_with_source_map {
 
             let mut slm = from_string_with_source_map(
                 &generated_code,
-                expected_map.sources.iter().map(|s| s.as_ref()).collect(),
-                expected_map
+                &expected_map.sources.iter().map(|s| s.as_ref()).collect(),
+                &expected_map
                     .sources_content
                     .iter()
                     .map(|s| s.as_ref())

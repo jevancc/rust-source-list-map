@@ -9,8 +9,8 @@ use StringPtr;
 
 pub fn from_string_with_source_map(
     code: &str,
-    sources: Vec<&str>,
-    sources_content: Vec<&str>,
+    sources: &Vec<&str>,
+    sources_content: &Vec<&str>,
     mappings: &str,
 ) -> SourceListMap {
     let mappings = mappings.split(';').enumerate();
